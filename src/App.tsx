@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Feed from "./pages/Feed";
 import Trainers from "./pages/Trainers";
 import TrainerProfile from "./pages/TrainerProfile";
+import HowItWorks from "./pages/HowItWorks";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import UserDashboard from "./pages/dashboard/UserDashboard";
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="/feed" element={<Feed />} />
               <Route path="/trainers" element={<Trainers />} />
               <Route path="/trainer/:username" element={<TrainerProfile />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<UserDashboard />} />

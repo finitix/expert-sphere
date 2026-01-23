@@ -21,30 +21,27 @@ export function Navbar() {
   const getDashboardLink = () => {
     if (!user) return "/login";
     switch (user.role) {
-      case "admin":
-        return "/admin";
-      case "trainer":
-        return "/trainer";
-      default:
-        return "/dashboard";
+      case "admin": return "/admin";
+      case "trainer": return "/trainer";
+      default: return "/dashboard";
     }
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-primary to-accent flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
-            <span className="font-display font-bold text-lg text-foreground">
+            <span className="font-display font-semibold text-lg text-foreground">
               TechSolve
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
@@ -62,7 +59,7 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Desktop CTA / User Menu */}
+          {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated && user ? (
               <div className="relative">
@@ -70,7 +67,7 @@ export function Navbar() {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted transition-colors"
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-primary flex items-center justify-center text-xs font-semibold text-white">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-xs font-medium text-white">
                     {user.avatar}
                   </div>
                   <span className="text-sm font-medium text-foreground">{user.name}</span>
@@ -80,20 +77,20 @@ export function Navbar() {
                 <AnimatePresence>
                   {showUserMenu && (
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
+                      initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
+                      exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 mt-2 w-56 rounded-lg bg-card border border-border shadow-lg overflow-hidden"
+                      className="absolute right-0 mt-2 w-56 rounded-lg bg-card border border-border shadow-xl overflow-hidden"
                     >
                       <div className="px-4 py-3 border-b border-border">
                         <p className="text-sm font-medium text-foreground">{user.name}</p>
                         <p className="text-xs text-muted-foreground">{user.email}</p>
-                        <span className="inline-block mt-1 chip-primary text-[10px]">
+                        <span className="inline-block mt-1.5 gh-badge-primary text-[10px]">
                           {user.role?.toUpperCase()}
                         </span>
                       </div>
-                      
+
                       <div className="py-1">
                         <Link
                           to={getDashboardLink()}
@@ -114,7 +111,7 @@ export function Navbar() {
                       </div>
 
                       <div className="py-1 border-t border-border">
-                        <p className="px-4 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        <p className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                           Switch Role (Demo)
                         </p>
                         {(["user", "trainer", "admin"] as const).map((role) => (
@@ -162,8 +159,8 @@ export function Navbar() {
                 >
                   Sign in
                 </Link>
-                <Link to="/signup" className="btn-primary">
-                  Get Started
+                <Link to="/signup" className="gh-btn-primary">
+                  Sign up
                 </Link>
               </>
             )}
@@ -186,7 +183,7 @@ export function Navbar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden overflow-hidden"
+              className="md:hidden overflow-hidden border-t border-border"
             >
               <div className="py-4 space-y-1">
                 {navLinks.map((link) => (
@@ -198,20 +195,20 @@ export function Navbar() {
                       "block px-3 py-2 text-sm font-medium rounded-md transition-colors",
                       location.pathname === link.href
                         ? "text-foreground bg-muted"
-                        : "text-muted-foreground hover:text-foreground"
+                        : "text-muted-foreground"
                     )}
                   >
                     {link.label}
                   </Link>
                 ))}
-                
-                <div className="pt-4 border-t border-border space-y-2">
+
+                <div className="pt-4 mt-4 border-t border-border space-y-2">
                   {isAuthenticated ? (
                     <>
                       <Link
                         to={getDashboardLink()}
                         onClick={() => setIsOpen(false)}
-                        className="block w-full btn-primary text-center"
+                        className="block w-full gh-btn-primary text-center"
                       >
                         Dashboard
                       </Link>
@@ -220,7 +217,7 @@ export function Navbar() {
                           logout();
                           setIsOpen(false);
                         }}
-                        className="w-full btn-outline"
+                        className="w-full gh-btn-secondary"
                       >
                         Sign out
                       </button>
@@ -230,16 +227,16 @@ export function Navbar() {
                       <Link
                         to="/login"
                         onClick={() => setIsOpen(false)}
-                        className="block w-full btn-outline text-center"
+                        className="block w-full gh-btn-secondary text-center"
                       >
                         Sign in
                       </Link>
                       <Link
                         to="/signup"
                         onClick={() => setIsOpen(false)}
-                        className="block w-full btn-primary text-center"
+                        className="block w-full gh-btn-primary text-center"
                       >
-                        Get Started
+                        Sign up
                       </Link>
                     </>
                   )}

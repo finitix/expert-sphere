@@ -1,19 +1,36 @@
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { ArrowRight, Zap, Shield, Clock, Star, Users, CheckCircle2, Code2, ChevronRight, Play, Sparkles, Globe, Cpu, Database, Lock, Rocket, Award } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BackgroundBeams, GlowOrbs, GridPattern, AnimatedBorderCard } from "@/components/effects/BackgroundEffects";
 import { SolvedFeed } from "@/components/feed/SolvedFeed";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 
 const easeOutExpo = [0.16, 1, 0.3, 1];
 
-const stats = [
-  { value: "10K+", label: "Problems Solved" },
-  { value: "500+", label: "Expert Trainers" },
-  { value: "4.9", label: "Average Rating" },
-  { value: "<2hr", label: "Avg Response" },
+// Hero carousel images - tech/problem solving themed
+const heroImages = [
+  {
+    src: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=600&fit=crop",
+    alt: "Developer solving complex problems",
+    badge: { title: "Problem Solved!", subtitle: "React SSR issue resolved in 45 mins" },
+  },
+  {
+    src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop",
+    alt: "Team collaborating on code",
+    badge: { title: "Expert Connected!", subtitle: "Matched with AWS specialist" },
+  },
+  {
+    src: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600&fit=crop",
+    alt: "Developer getting expert help",
+    badge: { title: "Bug Fixed!", subtitle: "Database optimization complete" },
+  },
+  {
+    src: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=600&fit=crop",
+    alt: "Technical mentorship session",
+    badge: { title: "Code Review Done!", subtitle: "Security vulnerabilities patched" },
+  },
 ];
 
 const features = [
@@ -105,6 +122,71 @@ const categories = [
   { icon: Code2, name: "Other", count: "890", color: "muted" },
 ];
 
+// Hero Carousel Component
+const HeroCarousel = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl shadow-primary/20">
+      <AnimatePresence mode="wait">
+        <motion.img
+          key={currentIndex}
+          src={heroImages[currentIndex].src}
+          alt={heroImages[currentIndex].alt}
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.7 }}
+          className="w-full h-auto aspect-[4/3] object-cover"
+        />
+      </AnimatePresence>
+      <div className="absolute inset-0 bg-gradient-to-tr from-background/60 via-transparent to-transparent" />
+      
+      {/* Floating Badge */}
+      <AnimatePresence mode="wait">
+        <motion.div 
+          key={`badge-${currentIndex}`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.4 }}
+          className="absolute bottom-4 left-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg p-4 border border-border"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+            </div>
+            <div>
+              <p className="font-medium text-foreground text-sm">{heroImages[currentIndex].badge.title}</p>
+              <p className="text-xs text-muted-foreground">{heroImages[currentIndex].badge.subtitle}</p>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Carousel Indicators */}
+      <div className="absolute top-4 right-4 flex gap-1.5">
+        {heroImages.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentIndex(i)}
+            className={`w-2 h-2 rounded-full transition-all ${
+              i === currentIndex ? "bg-primary w-6" : "bg-white/50 hover:bg-white/80"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -188,59 +270,17 @@ const Index = () => {
                   Browse trainers
                 </Link>
               </motion.div>
-
-              {/* Stats */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4, ease: easeOutExpo }}
-                className="flex flex-wrap items-center justify-center lg:justify-start gap-8 mt-10 pt-8 border-t border-border/50"
-              >
-                {stats.map((stat, i) => (
-                  <div key={stat.label} className="text-center lg:text-left">
-                    <div className="font-mono text-2xl md:text-3xl font-bold text-foreground mb-1">
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
-                  </div>
-                ))}
-              </motion.div>
             </div>
 
-            {/* Right Side - Hero Image */}
+            {/* Right Side - Hero Image Carousel */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4, ease: easeOutExpo }}
               className="relative"
             >
-              <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl shadow-primary/20">
-                <img 
-                  src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=600&fit=crop"
-                  alt="Developers collaborating on problem solving"
-                  className="w-full h-auto"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-background/60 via-transparent to-transparent" />
-                
-                {/* Floating Badge */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                  className="absolute bottom-4 left-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg p-4 border border-border"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
-                      <CheckCircle2 className="w-5 h-5 text-success" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground text-sm">Problem Solved!</p>
-                      <p className="text-xs text-muted-foreground">React SSR issue resolved in 45 mins</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-
+              <HeroCarousel />
+              
               {/* Decorative Elements */}
               <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
               <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />

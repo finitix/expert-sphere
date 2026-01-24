@@ -12,6 +12,7 @@ import TrainerProfile from "./pages/TrainerProfile";
 import HowItWorks from "./pages/HowItWorks";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import CreateTicket from "./pages/CreateTicket";
 import UserDashboard from "./pages/dashboard/UserDashboard";
 import TrainerDashboard from "./pages/dashboard/TrainerDashboard";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/create-ticket" element={<CreateTicket />} />
               <Route path="/dashboard" element={<UserDashboard />} />
               <Route path="/dashboard/*" element={<UserDashboard />} />
               <Route path="/trainer" element={<TrainerDashboard />} />

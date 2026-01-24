@@ -101,19 +101,24 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Navigation */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                "sidebar-link",
-                location.pathname === item.href && "active"
-              )}
-            >
-              <item.icon className="w-4 h-4" />
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const isActive = item.href === "/dashboard" || item.href === "/trainer" || item.href === "/admin"
+              ? location.pathname === item.href
+              : location.pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  "sidebar-link",
+                  isActive && "active"
+                )}
+              >
+                <item.icon className="w-4 h-4" />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Role Switcher (Demo) */}

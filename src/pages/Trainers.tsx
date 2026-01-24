@@ -18,7 +18,7 @@ const trainers = [
   {
     id: "sarahc",
     name: "Sarah Chen",
-    avatar: "SC",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
     role: "Full Stack Expert",
     location: "San Francisco, CA",
     skills: ["React", "Node.js", "AWS", "TypeScript"],
@@ -32,7 +32,7 @@ const trainers = [
   {
     id: "davidk",
     name: "David Kim",
-    avatar: "DK",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",
     role: "Database Specialist",
     location: "New York, NY",
     skills: ["PostgreSQL", "MongoDB", "Redis", "MySQL"],
@@ -46,7 +46,7 @@ const trainers = [
   {
     id: "jamesl",
     name: "James Lee",
-    avatar: "JL",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop",
     role: "Cloud Architect",
     location: "Seattle, WA",
     skills: ["AWS", "GCP", "Kubernetes", "Terraform"],
@@ -60,7 +60,7 @@ const trainers = [
   {
     id: "lisap",
     name: "Lisa Park",
-    avatar: "LP",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop",
     role: "Frontend Expert",
     location: "Austin, TX",
     skills: ["TypeScript", "Vue", "React", "Tailwind"],
@@ -74,7 +74,7 @@ const trainers = [
   {
     id: "toma",
     name: "Tom Anderson",
-    avatar: "TA",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop",
     role: "DevOps Engineer",
     location: "Denver, CO",
     skills: ["Docker", "CI/CD", "Terraform", "Linux"],
@@ -88,7 +88,7 @@ const trainers = [
   {
     id: "emmaw",
     name: "Emma Wilson",
-    avatar: "EW",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop",
     role: "Security Expert",
     location: "Boston, MA",
     skills: ["Penetration Testing", "OAuth", "Encryption"],
@@ -175,9 +175,11 @@ const Trainers = () => {
                   {/* Header */}
                   <div className="flex items-start gap-3 mb-4">
                     <div className="relative">
-                      <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-sm font-semibold text-white">
-                        {trainer.avatar}
-                      </div>
+                      <img 
+                        src={trainer.avatar} 
+                        alt={trainer.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
                       {trainer.online && (
                         <span className="absolute -bottom-0.5 -right-0.5 online-dot" />
                       )}

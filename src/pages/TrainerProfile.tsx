@@ -23,7 +23,8 @@ const trainerData = {
   sarahc: {
     id: "sarahc",
     name: "Sarah Chen",
-    avatar: "SC",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop",
+    coverImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=400&fit=crop",
     role: "Full Stack Expert",
     location: "San Francisco, CA",
     memberSince: "2022",
@@ -50,9 +51,9 @@ const trainerData = {
       { title: "TypeScript generic constraints", category: "TypeScript", rating: 5, time: "1 hr" },
     ],
     recentReviews: [
-      { user: "Alex J.", rating: 5, comment: "Sarah fixed my hydration issue in under an hour. Incredibly knowledgeable!", date: "2 days ago" },
-      { user: "Mike P.", rating: 5, comment: "Great communication and thorough explanation. Will definitely work with again.", date: "1 week ago" },
-      { user: "Emma W.", rating: 5, comment: "Solved a bug I'd been stuck on for days. Worth every penny!", date: "2 weeks ago" },
+      { user: "Alex J.", avatar: "https://images.unsplash.com/photo-1599566150163-29194dcabd36?w=100&h=100&fit=crop", rating: 5, comment: "Sarah fixed my hydration issue in under an hour. Incredibly knowledgeable!", date: "2 days ago" },
+      { user: "Mike P.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop", rating: 5, comment: "Great communication and thorough explanation. Will definitely work with again.", date: "1 week ago" },
+      { user: "Emma W.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop", rating: 5, comment: "Solved a bug I'd been stuck on for days. Worth every penny!", date: "2 weeks ago" },
     ],
   },
 };
@@ -70,14 +71,26 @@ const TrainerProfile = () => {
             <div className="max-w-4xl mx-auto">
               {/* Profile Header */}
               <FadeInView>
-                <div className="gh-card mb-6">
+                <div className="gh-card overflow-hidden mb-6">
+                  {/* Cover Image */}
+                  <div className="h-32 md:h-48 -mx-5 -mt-5 mb-6 relative">
+                    <img 
+                      src={trainer.coverImage} 
+                      alt="Cover"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+                  </div>
+                  
                   <div className="flex flex-col md:flex-row gap-6">
                     {/* Avatar */}
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 -mt-20 md:-mt-24 relative z-10">
                       <div className="relative">
-                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-primary flex items-center justify-center text-3xl font-bold text-white">
-                          {trainer.avatar}
-                        </div>
+                        <img 
+                          src={trainer.avatar} 
+                          alt={trainer.name}
+                          className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-card"
+                        />
                         {trainer.online && (
                           <span className="absolute bottom-2 right-2 w-5 h-5 bg-success rounded-full border-4 border-card" />
                         )}
@@ -205,9 +218,11 @@ const TrainerProfile = () => {
                           <div key={i} className="pb-4 border-b border-border last:border-0 last:pb-0">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold">
-                                  {review.user.charAt(0)}
-                                </div>
+                                <img 
+                                  src={review.avatar} 
+                                  alt={review.user}
+                                  className="w-8 h-8 rounded-full object-cover"
+                                />
                                 <span className="font-medium text-foreground">{review.user}</span>
                               </div>
                               <div className="flex items-center gap-1">

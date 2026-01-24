@@ -10,6 +10,7 @@ import Feed from "./pages/Feed";
 import Trainers from "./pages/Trainers";
 import TrainerProfile from "./pages/TrainerProfile";
 import HowItWorks from "./pages/HowItWorks";
+import About from "./pages/About";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import CreateTicket from "./pages/CreateTicket";
@@ -50,6 +51,7 @@ const App = () => (
               <Route path="/trainers" element={<Trainers />} />
               <Route path="/trainer/:username" element={<TrainerProfile />} />
               <Route path="/how-it-works" element={<HowItWorks />} />
+              <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/create-ticket" element={<CreateTicket />} />

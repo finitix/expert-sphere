@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
+  { label: "Home", href: "/" },
   { label: "Feed", href: "/feed" },
   { label: "Trainers", href: "/trainers" },
   { label: "How It Works", href: "/how-it-works" },

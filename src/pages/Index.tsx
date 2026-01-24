@@ -311,19 +311,23 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-24 relative">
-        <div className="container mx-auto px-4">
+      {/* Categories Section - with parallax */}
+      <section className="py-24 relative overflow-hidden">
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent"
+          style={{ y: useTransform(scrollYProgress, [0, 1], [0, -100]) }}
+        />
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: easeOutExpo }}
+            transition={{ duration: 0.8, ease: easeOutExpo }}
             className="text-center mb-12"
           >
             <span className="gh-badge-blue mb-4 inline-block">Categories</span>
             <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
-              Get help in any <span className="gradient-text-blue">tech domain</span>
+              Get help in <span className="gradient-text-blue">any domain</span>
             </h2>
           </motion.div>
 
@@ -331,14 +335,14 @@ const Index = () => {
             {categories.map((cat, i) => (
               <motion.div
                 key={cat.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                whileHover={{ scale: 1.05, y: -5 }}
+                transition={{ duration: 0.6, delay: i * 0.08, ease: easeOutExpo }}
+                whileHover={{ scale: 1.08, y: -8, rotateY: 5 }}
                 className="gh-card text-center cursor-pointer group"
               >
-                <div className={`w-12 h-12 rounded-xl bg-${cat.color}/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 rounded-xl bg-${cat.color}/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
                   <cat.icon className={`w-6 h-6 text-${cat.color}`} />
                 </div>
                 <p className="font-semibold text-foreground">{cat.name}</p>
@@ -349,20 +353,33 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Recently Solved - X/Twitter Style */}
-      <section className="py-24 relative border-t border-border">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background-secondary to-background" />
+      {/* Recently Solved - with staggered animations */}
+      <section className="py-24 relative border-t border-border overflow-hidden">
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-b from-background via-background-secondary to-background"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+        />
         
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: easeOutExpo }}
+            transition={{ duration: 0.8, ease: easeOutExpo }}
             className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 gap-4"
           >
             <div>
-              <span className="gh-badge-primary mb-4 inline-block">Live Feed</span>
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="gh-badge-primary mb-4 inline-block"
+              >
+                Live Feed
+              </motion.span>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">
                 Recently <span className="gradient-text-green">Solved</span>
               </h2>
@@ -370,16 +387,23 @@ const Index = () => {
                 Watch real problems getting solved in real-time
               </p>
             </div>
-            <Link to="/feed" className="flex items-center gap-1 text-sm text-primary hover:underline">
-              View all <ChevronRight className="w-4 h-4" />
-            </Link>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+            >
+              <Link to="/feed" className="flex items-center gap-1 text-sm text-primary hover:underline group">
+                View all <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </motion.div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, delay: 0.1, ease: easeOutExpo }}
+            transition={{ duration: 0.8, delay: 0.2, ease: easeOutExpo }}
           >
             <SolvedFeed limit={4} />
           </motion.div>
@@ -417,27 +441,43 @@ const Index = () => {
               {steps.map((step, i) => (
                 <motion.div
                   key={step.step}
-                  initial={{ opacity: 0, x: i % 2 === 0 ? -50 : 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, x: i % 2 === 0 ? -80 : 80, rotateY: i % 2 === 0 ? -10 : 10 }}
+                  whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.6, delay: i * 0.1, ease: easeOutExpo }}
+                  transition={{ duration: 0.8, delay: i * 0.15, ease: easeOutExpo }}
                   className={`flex flex-col md:flex-row items-center gap-8 ${i % 2 === 0 ? "" : "md:flex-row-reverse"}`}
                 >
-                  <div className={`flex-1 ${i % 2 === 0 ? "md:text-right" : "md:text-left"}`}>
-                    <div className={`inline-block px-3 py-1 rounded-full bg-gradient-to-r ${step.gradient} text-white text-sm font-mono mb-3`}>
+                  <motion.div 
+                    className={`flex-1 ${i % 2 === 0 ? "md:text-right" : "md:text-left"}`}
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <motion.div 
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      whileInView={{ scale: 1, opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.15 + 0.2 }}
+                      className={`inline-block px-3 py-1 rounded-full bg-gradient-to-r ${step.gradient} text-white text-sm font-mono mb-3`}
+                    >
                       Step {step.step}
-                    </div>
+                    </motion.div>
                     <h3 className="text-2xl font-display font-bold text-foreground mb-2">{step.title}</h3>
                     <p className="text-muted-foreground">{step.description}</p>
-                  </div>
+                  </motion.div>
                   
-                  <div className="hidden md:flex w-16 h-16 rounded-full bg-gradient-to-br from-card to-card-hover border border-border items-center justify-center z-10 flex-shrink-0">
+                  <motion.div 
+                    className="hidden md:flex w-16 h-16 rounded-full bg-gradient-to-br from-card to-card-hover border border-border items-center justify-center z-10 flex-shrink-0"
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.15 + 0.3, type: "spring", stiffness: 200 }}
+                  >
                     <span className="font-mono font-bold text-foreground">{step.step}</span>
-                  </div>
+                  </motion.div>
                   
                   <div className="flex-1">
                     <motion.div
-                      whileHover={{ scale: 1.02 }}
+                      whileHover={{ scale: 1.05, rotateY: 5 }}
+                      transition={{ duration: 0.4 }}
                       className="rounded-xl overflow-hidden border border-border shadow-2xl shadow-primary/10"
                     >
                       <img 
@@ -477,19 +517,24 @@ const Index = () => {
             {features.map((feature, i) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 60, rotateX: -15 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: i * 0.1, ease: easeOutExpo }}
+                transition={{ duration: 0.7, delay: i * 0.15, ease: easeOutExpo }}
+                whileHover={{ y: -10, scale: 1.02 }}
               >
                 <AnimatedBorderCard>
-                  <div className="h-32 mb-4 -mx-2 -mt-2 rounded-lg overflow-hidden">
+                  <motion.div 
+                    className="h-32 mb-4 -mx-2 -mt-2 rounded-lg overflow-hidden"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <img 
                       src={feature.image} 
                       alt={feature.title}
-                      className="w-full h-full object-cover transition-transform hover:scale-105"
+                      className="w-full h-full object-cover transition-transform hover:scale-110 duration-500"
                     />
-                  </div>
+                  </motion.div>
                   <div className={`w-12 h-12 rounded-lg bg-${feature.color}/10 flex items-center justify-center mb-4`}>
                     <feature.icon className={`w-6 h-6 text-${feature.color}`} />
                   </div>

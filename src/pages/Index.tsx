@@ -5,8 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BackgroundBeams, GlowOrbs, GridPattern, AnimatedBorderCard } from "@/components/effects/BackgroundEffects";
 import { SolvedFeed } from "@/components/feed/SolvedFeed";
-import { SimpleHeroScene, FeatureIcon3D } from "@/components/3d/SimpleHero3D";
-import { useRef, Suspense } from "react";
+import { useRef } from "react";
 
 const easeOutExpo = [0.16, 1, 0.3, 1];
 
@@ -23,21 +22,21 @@ const features = [
     title: "Verified Experts",
     description: "Every trainer passes rigorous verification. Real expertise, proven results.",
     color: "primary",
-    widget: "shield" as const,
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=250&fit=crop",
   },
   {
     icon: Clock,
     title: "Lightning Fast",
     description: "Get matched with the right expert in minutes. Most issues resolved same-day.",
     color: "accent",
-    widget: "lightning" as const,
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop",
   },
   {
     icon: Star,
     title: "Pay for Results",
     description: "Your payment is held in escrow. Release only when you're satisfied.",
     color: "secondary",
-    widget: "check" as const,
+    image: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=400&h=250&fit=crop",
   },
 ];
 
@@ -121,8 +120,8 @@ const Index = () => {
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
 
-      {/* Hero Section with 3D */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Hero Section - Side by Side Layout */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0">
           <GlowOrbs />
@@ -130,85 +129,121 @@ const Index = () => {
           <GridPattern />
         </div>
 
-        {/* Simplified 3D Scene */}
-        <Suspense fallback={null}>
-          <SimpleHeroScene />
-        </Suspense>
-
         <motion.div
           style={{ opacity: heroOpacity, y: heroY, scale: heroScale }}
-          className="container mx-auto px-4 relative z-10 pt-20"
+          className="container mx-auto px-4 relative z-10 pt-24 pb-16"
         >
-          <div className="max-w-5xl mx-auto text-center">
-            {/* Badge */}
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left Side - Text Content */}
+            <div className="text-center lg:text-left">
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: easeOutExpo }}
+                className="mb-6"
+              >
+                <span className="gh-badge-primary inline-flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Trusted by 10,000+ developers worldwide
+                </span>
+              </motion.div>
+
+              {/* Headline */}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.1, ease: easeOutExpo }}
+                className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-foreground mb-6 leading-[1.05] tracking-tight"
+              >
+                Build with the power of
+                <br />
+                <span className="gradient-text">verified experts</span>
+              </motion.h1>
+
+              {/* Subheadline */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2, ease: easeOutExpo }}
+                className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
+              >
+                Post your tech problem. Get matched with verified trainers.
+                Pay only when it's solved.
+              </motion.p>
+
+              {/* CTAs */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3, ease: easeOutExpo }}
+                className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4"
+              >
+                <Link to="/create-ticket" className="gh-btn-primary px-8 py-3 text-base group">
+                  Post a Ticket
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+                <Link to="/trainers" className="gh-btn-secondary px-8 py-3 text-base group">
+                  <Play className="w-4 h-4" />
+                  Browse trainers
+                </Link>
+              </motion.div>
+
+              {/* Stats */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4, ease: easeOutExpo }}
+                className="flex flex-wrap items-center justify-center lg:justify-start gap-8 mt-10 pt-8 border-t border-border/50"
+              >
+                {stats.map((stat, i) => (
+                  <div key={stat.label} className="text-center lg:text-left">
+                    <div className="font-mono text-2xl md:text-3xl font-bold text-foreground mb-1">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Right Side - Hero Image */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: easeOutExpo }}
-              className="mb-8"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: easeOutExpo }}
+              className="relative"
             >
-              <span className="gh-badge-primary inline-flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5" />
-                Trusted by 10,000+ developers worldwide
-              </span>
-            </motion.div>
-
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: easeOutExpo }}
-              className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-foreground mb-6 leading-[0.95] tracking-tight"
-            >
-              Build with the power of
-              <br />
-              <span className="gradient-text">verified experts</span>
-            </motion.h1>
-
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: easeOutExpo }}
-              className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed"
-            >
-              Post your tech problem. Get matched with verified trainers.
-              <br className="hidden md:block" />
-              Pay only when it's solved.
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: easeOutExpo }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
-            >
-              <Link to="/create-ticket" className="gh-btn-primary px-8 py-3 text-base group">
-                Post a Ticket
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link to="/trainers" className="gh-btn-secondary px-8 py-3 text-base group">
-                <Play className="w-4 h-4" />
-                Browse trainers
-              </Link>
-            </motion.div>
-
-            {/* Hero Image */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5, ease: easeOutExpo }}
-              className="mt-16 max-w-4xl mx-auto"
-            >
-              <div className="relative rounded-xl overflow-hidden border border-border shadow-2xl shadow-primary/10">
+              <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl shadow-primary/20">
                 <img 
-                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&h=600&fit=crop"
-                  alt="Team solving problems together"
+                  src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=600&fit=crop"
+                  alt="Developers collaborating on problem solving"
                   className="w-full h-auto"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-background/60 via-transparent to-transparent" />
+                
+                {/* Floating Badge */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="absolute bottom-4 left-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg p-4 border border-border"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+                      <CheckCircle2 className="w-5 h-5 text-success" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground text-sm">Problem Solved!</p>
+                      <p className="text-xs text-muted-foreground">React SSR issue resolved in 45 mins</p>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
+
+              {/* Decorative Elements */}
+              <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
+              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />
             </motion.div>
           </div>
         </motion.div>
@@ -408,10 +443,12 @@ const Index = () => {
                 transition={{ duration: 0.5, delay: i * 0.1, ease: easeOutExpo }}
               >
                 <AnimatedBorderCard>
-                  <div className="h-24 mb-4 -mx-2 -mt-2">
-                    <Suspense fallback={<div className="w-full h-full bg-muted/20 rounded-lg animate-pulse" />}>
-                      <FeatureIcon3D type={feature.widget} />
-                    </Suspense>
+                  <div className="h-32 mb-4 -mx-2 -mt-2 rounded-lg overflow-hidden">
+                    <img 
+                      src={feature.image} 
+                      alt={feature.title}
+                      className="w-full h-full object-cover transition-transform hover:scale-105"
+                    />
                   </div>
                   <div className={`w-12 h-12 rounded-lg bg-${feature.color}/10 flex items-center justify-center mb-4`}>
                     <feature.icon className={`w-6 h-6 text-${feature.color}`} />
@@ -513,11 +550,16 @@ const Index = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="h-[200px] hidden md:block"
+              className="hidden md:block"
             >
-              <Suspense fallback={<div className="w-full h-full bg-muted/20 rounded-lg animate-pulse" />}>
-                <FeatureIcon3D type="check" />
-              </Suspense>
+              <div className="relative rounded-xl overflow-hidden border border-border shadow-xl">
+                <img 
+                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=500&h=350&fit=crop"
+                  alt="Expert developer ready to help"
+                  className="w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
+              </div>
             </motion.div>
           </div>
         </div>

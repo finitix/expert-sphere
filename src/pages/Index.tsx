@@ -5,7 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BackgroundBeams, GlowOrbs, GridPattern, AnimatedBorderCard } from "@/components/effects/BackgroundEffects";
 import { SolvedFeed } from "@/components/feed/SolvedFeed";
-import { Hero3DScene, Widget3D, CodeScene3D } from "@/components/3d/Hero3DScene";
+import { SimpleHeroScene, FeatureIcon3D } from "@/components/3d/SimpleHero3D";
 import { useRef, Suspense } from "react";
 
 const easeOutExpo = [0.16, 1, 0.3, 1];
@@ -23,21 +23,21 @@ const features = [
     title: "Verified Experts",
     description: "Every trainer passes rigorous verification. Real expertise, proven results.",
     color: "primary",
-    widget: "sphere" as const,
+    widget: "shield" as const,
   },
   {
     icon: Clock,
     title: "Lightning Fast",
     description: "Get matched with the right expert in minutes. Most issues resolved same-day.",
     color: "accent",
-    widget: "torus" as const,
+    widget: "lightning" as const,
   },
   {
     icon: Star,
     title: "Pay for Results",
     description: "Your payment is held in escrow. Release only when you're satisfied.",
     color: "secondary",
-    widget: "icosahedron" as const,
+    widget: "check" as const,
   },
 ];
 
@@ -130,9 +130,9 @@ const Index = () => {
           <GridPattern />
         </div>
 
-        {/* 3D Scene */}
+        {/* Simplified 3D Scene */}
         <Suspense fallback={null}>
-          <Hero3DScene />
+          <SimpleHeroScene />
         </Suspense>
 
         <motion.div
@@ -194,44 +194,23 @@ const Index = () => {
               </Link>
             </motion.div>
 
-            {/* Stats */}
+            {/* Hero Image */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4, ease: easeOutExpo }}
-              className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6"
+              transition={{ duration: 0.8, delay: 0.5, ease: easeOutExpo }}
+              className="mt-16 max-w-4xl mx-auto"
             >
-              {stats.map((stat, i) => (
-                <div key={stat.label} className="text-center">
-                  <motion.div
-                    initial={{ scale: 0.5 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.5 + i * 0.1, type: "spring", stiffness: 200 }}
-                    className="font-mono text-3xl md:text-4xl font-bold text-foreground mb-1"
-                  >
-                    {stat.value}
-                  </motion.div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </div>
-              ))}
+              <div className="relative rounded-xl overflow-hidden border border-border shadow-2xl shadow-primary/10">
+                <img 
+                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&h=600&fit=crop"
+                  alt="Team solving problems together"
+                  className="w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+              </div>
             </motion.div>
           </div>
-
-          {/* Scroll indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 1 }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2"
-          >
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-1"
-            >
-              <motion.div className="w-1.5 h-3 rounded-full bg-muted-foreground/50" />
-            </motion.div>
-          </motion.div>
         </motion.div>
       </section>
 
@@ -429,9 +408,9 @@ const Index = () => {
                 transition={{ duration: 0.5, delay: i * 0.1, ease: easeOutExpo }}
               >
                 <AnimatedBorderCard>
-                  <div className="h-32 mb-4 -mx-2 -mt-2">
+                  <div className="h-24 mb-4 -mx-2 -mt-2">
                     <Suspense fallback={<div className="w-full h-full bg-muted/20 rounded-lg animate-pulse" />}>
-                      <Widget3D type={feature.widget} />
+                      <FeatureIcon3D type={feature.widget} />
                     </Suspense>
                   </div>
                   <div className={`w-12 h-12 rounded-lg bg-${feature.color}/10 flex items-center justify-center mb-4`}>

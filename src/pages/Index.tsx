@@ -513,10 +513,10 @@ const Index = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="h-[300px] hidden md:block"
+              className="h-[200px] hidden md:block"
             >
               <Suspense fallback={<div className="w-full h-full bg-muted/20 rounded-lg animate-pulse" />}>
-                <CodeScene3D />
+                <FeatureIcon3D type="check" />
               </Suspense>
             </motion.div>
           </div>

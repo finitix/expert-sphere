@@ -1,13 +1,17 @@
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence, useReducedMotion, useSpring } from "framer-motion";
 import { ArrowRight, Zap, Shield, Clock, Star, Users, CheckCircle2, Code2, ChevronRight, Play, Sparkles, Globe, Cpu, Database, Lock, Rocket, Award } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BackgroundBeams, GlowOrbs, GridPattern, AnimatedBorderCard } from "@/components/effects/BackgroundEffects";
 import { SolvedFeed } from "@/components/feed/SolvedFeed";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo, useCallback } from "react";
 
-const easeOutExpo = [0.16, 1, 0.3, 1];
+// Optimized easing for silky smooth animations
+const smoothSpring = { type: "spring", stiffness: 100, damping: 20, mass: 0.5 };
+const fastSpring = { type: "spring", stiffness: 200, damping: 25, mass: 0.3 };
+const smoothTween = { type: "tween", ease: [0.25, 0.46, 0.45, 0.94], duration: 0.6 };
+const fastTween = { type: "tween", ease: [0.25, 0.46, 0.45, 0.94], duration: 0.4 };
 
 // Hero carousel images - tech/problem solving themed
 const heroImages = [
@@ -122,9 +126,10 @@ const categories = [
   { icon: Code2, name: "Other", count: "890", color: "muted" },
 ];
 
-// Hero Carousel Component
+// Optimized Hero Carousel Component with smooth transitions
 const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -133,36 +138,48 @@ const HeroCarousel = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const handleIndicatorClick = useCallback((index: number) => {
+    setCurrentIndex(index);
+  }, []);
+
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl shadow-primary/20">
-      <AnimatePresence mode="wait">
+    <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl shadow-primary/20 gpu-accelerate">
+      <AnimatePresence mode="popLayout">
         <motion.img
           key={currentIndex}
           src={heroImages[currentIndex].src}
           alt={heroImages[currentIndex].alt}
-          initial={{ opacity: 0, scale: 1.1 }}
+          initial={{ opacity: 0, scale: 1.03 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.7 }}
-          className="w-full h-auto aspect-[4/3] object-cover"
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ 
+            opacity: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+            scale: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }
+          }}
+          className="w-full h-auto aspect-[4/3] object-cover will-change-transform"
+          loading="eager"
         />
       </AnimatePresence>
-      <div className="absolute inset-0 bg-gradient-to-tr from-background/60 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-background/60 via-transparent to-transparent pointer-events-none" />
       
-      {/* Floating Badge */}
-      <AnimatePresence mode="wait">
+      {/* Floating Badge with smooth entrance */}
+      <AnimatePresence mode="popLayout">
         <motion.div 
           key={`badge-${currentIndex}`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.4 }}
-          className="absolute bottom-4 left-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg p-4 border border-border"
+          initial={{ opacity: 0, y: 16, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -8, scale: 0.98 }}
+          transition={smoothTween}
+          className="absolute bottom-4 left-4 right-4 bg-background/90 backdrop-blur-md rounded-lg p-4 border border-border will-change-transform"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+            <motion.div 
+              className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center"
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
               <CheckCircle2 className="w-5 h-5 text-success" />
-            </div>
+            </motion.div>
             <div>
               <p className="font-medium text-foreground text-sm">{heroImages[currentIndex].badge.title}</p>
               <p className="text-xs text-muted-foreground">{heroImages[currentIndex].badge.subtitle}</p>
@@ -171,15 +188,20 @@ const HeroCarousel = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Carousel Indicators */}
+      {/* Smooth Carousel Indicators */}
       <div className="absolute top-4 right-4 flex gap-1.5">
         {heroImages.map((_, i) => (
-          <button
+          <motion.button
             key={i}
-            onClick={() => setCurrentIndex(i)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              i === currentIndex ? "bg-primary w-6" : "bg-white/50 hover:bg-white/80"
-            }`}
+            onClick={() => handleIndicatorClick(i)}
+            className="h-2 rounded-full bg-white/50 hover:bg-white/80"
+            animate={{ 
+              width: i === currentIndex ? 24 : 8,
+              backgroundColor: i === currentIndex ? "hsl(var(--primary))" : "rgba(255,255,255,0.5)"
+            }}
+            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
           />
         ))}
       </div>
@@ -189,14 +211,28 @@ const HeroCarousel = () => {
 
 const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+  
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
 
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+  // Use spring for smoother scroll-linked animations
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
+  const heroOpacity = useTransform(smoothProgress, [0, 0.4], [1, 0]);
+  const heroY = useTransform(smoothProgress, [0, 0.4], [0, -60]);
+  const heroScale = useTransform(smoothProgress, [0, 0.4], [1, 0.97]);
+
+  // Memoized animation variants for consistency
+  const fadeUpVariant = useMemo(() => ({
+    hidden: { opacity: 0, y: 20 },
+    visible: (delay: number = 0) => ({
+      opacity: 1,
+      y: 0,
+      transition: { ...smoothTween, delay }
+    })
+  }), []);
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
@@ -220,70 +256,111 @@ const Index = () => {
             <div className="text-center lg:text-left">
               {/* Badge */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: easeOutExpo }}
+                initial={{ opacity: 0, y: 16, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ ...smoothTween, delay: 0.1 }}
                 className="mb-6"
               >
                 <span className="gh-badge-primary inline-flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <motion.span
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                  </motion.span>
                   Trusted by 10,000+ developers worldwide
                 </span>
               </motion.div>
 
-              {/* Headline */}
+              {/* Headline with staggered word reveal */}
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.1, ease: easeOutExpo }}
+                transition={{ ...smoothTween, delay: 0.2 }}
                 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-foreground mb-6 leading-[1.05] tracking-tight"
               >
                 Build with the power of
                 <br />
-                <span className="gradient-text">verified experts</span>
+                <motion.span 
+                  className="gradient-text inline-block"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ ...smoothTween, delay: 0.35 }}
+                >
+                  verified experts
+                </motion.span>
               </motion.h1>
 
               {/* Subheadline */}
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2, ease: easeOutExpo }}
+                transition={{ ...smoothTween, delay: 0.4 }}
                 className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
               >
                 Post your tech problem. Get matched with verified trainers.
                 Pay only when it's solved.
               </motion.p>
 
-              {/* CTAs */}
+              {/* CTAs with micro-interactions */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3, ease: easeOutExpo }}
+                transition={{ ...smoothTween, delay: 0.5 }}
                 className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4"
               >
-                <Link to="/create-ticket" className="gh-btn-primary px-8 py-3 text-base group">
-                  Post a Ticket
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <Link to="/create-ticket">
+                  <motion.span 
+                    className="gh-btn-primary px-8 py-3 text-base group inline-flex items-center gap-2"
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={fastSpring}
+                  >
+                    Post a Ticket
+                    <motion.span
+                      className="inline-block"
+                      initial={{ x: 0 }}
+                      whileHover={{ x: 4 }}
+                      transition={fastSpring}
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </motion.span>
+                  </motion.span>
                 </Link>
-                <Link to="/trainers" className="gh-btn-secondary px-8 py-3 text-base group">
-                  <Play className="w-4 h-4" />
-                  Browse trainers
+                <Link to="/trainers">
+                  <motion.span 
+                    className="gh-btn-secondary px-8 py-3 text-base group inline-flex items-center gap-2"
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={fastSpring}
+                  >
+                    <Play className="w-4 h-4" />
+                    Browse trainers
+                  </motion.span>
                 </Link>
               </motion.div>
             </div>
 
             {/* Right Side - Hero Image Carousel */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.4, ease: easeOutExpo }}
-              className="relative"
+              transition={{ ...smoothTween, delay: 0.5 }}
+              className="relative gpu-accelerate"
             >
               <HeroCarousel />
               
-              {/* Decorative Elements */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
-              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />
+              {/* Decorative Elements with subtle animation */}
+              <motion.div 
+                className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl"
+                animate={{ scale: [1, 1.1, 1], opacity: [0.6, 0.8, 0.6] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div 
+                className="absolute -bottom-4 -left-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl"
+                animate={{ scale: [1.1, 1, 1.1], opacity: [0.5, 0.7, 0.5] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              />
             </motion.div>
           </div>
         </motion.div>
@@ -319,10 +396,10 @@ const Index = () => {
         />
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: easeOutExpo }}
+            transition={smoothTween}
             className="text-center mb-12"
           >
             <span className="gh-badge-blue mb-4 inline-block">Categories</span>
@@ -335,16 +412,21 @@ const Index = () => {
             {categories.map((cat, i) => (
               <motion.div
                 key={cat.name}
-                initial={{ opacity: 0, y: 40, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.08, ease: easeOutExpo }}
-                whileHover={{ scale: 1.08, y: -8, rotateY: 5 }}
-                className="gh-card text-center cursor-pointer group"
+                transition={{ ...fastTween, delay: i * 0.05 }}
+                whileHover={{ scale: 1.05, y: -6 }}
+                whileTap={{ scale: 0.98 }}
+                className="gh-card text-center cursor-pointer group gpu-accelerate"
               >
-                <div className={`w-12 h-12 rounded-xl bg-${cat.color}/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                <motion.div 
+                  className={`w-12 h-12 rounded-xl bg-${cat.color}/10 flex items-center justify-center mx-auto mb-3`}
+                  whileHover={{ scale: 1.1, rotate: 6 }}
+                  transition={fastSpring}
+                >
                   <cat.icon className={`w-6 h-6 text-${cat.color}`} />
-                </div>
+                </motion.div>
                 <p className="font-semibold text-foreground">{cat.name}</p>
                 <p className="text-sm text-muted-foreground">{cat.count} solved</p>
               </motion.div>
@@ -364,18 +446,18 @@ const Index = () => {
         
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: easeOutExpo }}
+            transition={smoothTween}
             className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 gap-4"
           >
             <div>
               <motion.span 
-                initial={{ opacity: 0, scale: 0.8 }}
+                initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
+                transition={{ ...fastTween, delay: 0.1 }}
                 className="gh-badge-primary mb-4 inline-block"
               >
                 Live Feed
@@ -388,22 +470,25 @@ const Index = () => {
               </p>
             </div>
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: 16 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
+              transition={{ ...fastTween, delay: 0.2 }}
             >
               <Link to="/feed" className="flex items-center gap-1 text-sm text-primary hover:underline group">
-                View all <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                View all 
+                <motion.span whileHover={{ x: 4 }} transition={fastSpring}>
+                  <ChevronRight className="w-4 h-4" />
+                </motion.span>
               </Link>
             </motion.div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.8, delay: 0.2, ease: easeOutExpo }}
+            transition={{ ...smoothTween, delay: 0.15 }}
           >
             <SolvedFeed limit={4} />
           </motion.div>
@@ -418,10 +503,10 @@ const Index = () => {
 
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: easeOutExpo }}
+            transition={smoothTween}
             className="text-center mb-16"
           >
             <span className="gh-badge-purple mb-4 inline-block">How It Works</span>
@@ -441,21 +526,22 @@ const Index = () => {
               {steps.map((step, i) => (
                 <motion.div
                   key={step.step}
-                  initial={{ opacity: 0, x: i % 2 === 0 ? -80 : 80, rotateY: i % 2 === 0 ? -10 : 10 }}
-                  whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+                  initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40 }}
+                  whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.8, delay: i * 0.15, ease: easeOutExpo }}
+                  transition={{ ...smoothTween, delay: i * 0.1 }}
                   className={`flex flex-col md:flex-row items-center gap-8 ${i % 2 === 0 ? "" : "md:flex-row-reverse"}`}
                 >
                   <motion.div 
                     className={`flex-1 ${i % 2 === 0 ? "md:text-right" : "md:text-left"}`}
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.01 }}
+                    transition={fastSpring}
                   >
                     <motion.div 
-                      initial={{ scale: 0.8, opacity: 0 }}
+                      initial={{ scale: 0.9, opacity: 0 }}
                       whileInView={{ scale: 1, opacity: 1 }}
                       viewport={{ once: true }}
-                      transition={{ delay: i * 0.15 + 0.2 }}
+                      transition={{ ...fastTween, delay: i * 0.1 + 0.15 }}
                       className={`inline-block px-3 py-1 rounded-full bg-gradient-to-r ${step.gradient} text-white text-sm font-mono mb-3`}
                     >
                       Step {step.step}
@@ -469,21 +555,22 @@ const Index = () => {
                     initial={{ scale: 0 }}
                     whileInView={{ scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.15 + 0.3, type: "spring", stiffness: 200 }}
+                    transition={{ ...smoothSpring, delay: i * 0.1 + 0.2 }}
                   >
                     <span className="font-mono font-bold text-foreground">{step.step}</span>
                   </motion.div>
                   
                   <div className="flex-1">
                     <motion.div
-                      whileHover={{ scale: 1.05, rotateY: 5 }}
-                      transition={{ duration: 0.4 }}
-                      className="rounded-xl overflow-hidden border border-border shadow-2xl shadow-primary/10"
+                      whileHover={{ scale: 1.03, y: -4 }}
+                      transition={fastSpring}
+                      className="rounded-xl overflow-hidden border border-border shadow-2xl shadow-primary/10 gpu-accelerate"
                     >
                       <img 
                         src={step.image} 
                         alt={step.title}
                         className="w-full h-48 md:h-56 object-cover"
+                        loading="lazy"
                       />
                     </motion.div>
                   </div>
@@ -498,10 +585,10 @@ const Index = () => {
       <section className="py-24 relative border-t border-border bg-background-secondary">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: easeOutExpo }}
+            transition={smoothTween}
             className="text-center mb-16"
           >
             <span className="gh-badge-blue mb-4 inline-block">Why TechSolve</span>
@@ -517,27 +604,32 @@ const Index = () => {
             {features.map((feature, i) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 60, rotateX: -15 }}
-                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                initial={{ opacity: 0, y: 32 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.7, delay: i * 0.15, ease: easeOutExpo }}
-                whileHover={{ y: -10, scale: 1.02 }}
+                transition={{ ...smoothTween, delay: i * 0.1 }}
+                whileHover={{ y: -8 }}
               >
                 <AnimatedBorderCard>
                   <motion.div 
                     className="h-32 mb-4 -mx-2 -mt-2 rounded-lg overflow-hidden"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.3 }}
+                    whileHover={{ scale: 1.03 }}
+                    transition={fastSpring}
                   >
                     <img 
                       src={feature.image} 
                       alt={feature.title}
-                      className="w-full h-full object-cover transition-transform hover:scale-110 duration-500"
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                      loading="lazy"
                     />
                   </motion.div>
-                  <div className={`w-12 h-12 rounded-lg bg-${feature.color}/10 flex items-center justify-center mb-4`}>
+                  <motion.div 
+                    className={`w-12 h-12 rounded-lg bg-${feature.color}/10 flex items-center justify-center mb-4`}
+                    whileHover={{ scale: 1.1, rotate: 6 }}
+                    transition={fastSpring}
+                  >
                     <feature.icon className={`w-6 h-6 text-${feature.color}`} />
-                  </div>
+                  </motion.div>
                   <h3 className="text-xl font-display font-semibold text-foreground mb-2">{feature.title}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
                 </AnimatedBorderCard>
@@ -551,10 +643,10 @@ const Index = () => {
       <section className="py-24 relative">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: easeOutExpo }}
+            transition={smoothTween}
             className="text-center mb-16"
           >
             <span className="gh-badge-primary mb-4 inline-block">Testimonials</span>
@@ -567,15 +659,24 @@ const Index = () => {
             {testimonials.map((testimonial, i) => (
               <motion.div
                 key={testimonial.author}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="gh-card"
+                transition={{ ...fastTween, delay: i * 0.08 }}
+                whileHover={{ y: -6 }}
+                className="gh-card gpu-accelerate"
               >
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 text-warning fill-current" />
+                    <motion.div
+                      key={j}
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ ...fastSpring, delay: i * 0.08 + j * 0.05 }}
+                    >
+                      <Star className="w-4 h-4 text-warning fill-current" />
+                    </motion.div>
                   ))}
                 </div>
                 <p className="text-foreground mb-6 leading-relaxed">"{testimonial.quote}"</p>
@@ -584,6 +685,7 @@ const Index = () => {
                     src={testimonial.avatar} 
                     alt={testimonial.author}
                     className="w-10 h-10 rounded-full object-cover"
+                    loading="lazy"
                   />
                   <div>
                     <p className="font-medium text-foreground">{testimonial.author}</p>
@@ -606,45 +708,74 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ opacity: 0, x: -24 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={smoothTween}
             >
               <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-6 leading-tight">
                 Ready to solve your
                 <br />
-                <span className="gradient-text">tech problems?</span>
+                <motion.span 
+                  className="gradient-text inline-block"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ ...smoothTween, delay: 0.2 }}
+                >
+                  tech problems?
+                </motion.span>
               </h2>
               <p className="text-xl text-muted-foreground mb-8">
                 Join thousands of developers getting expert help every day.
               </p>
               <div className="flex flex-col sm:flex-row items-start gap-4">
-                <Link to="/create-ticket" className="gh-btn-primary px-10 py-4 text-lg group">
-                  Post a Ticket Free
-                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                <Link to="/create-ticket">
+                  <motion.span 
+                    className="gh-btn-primary px-10 py-4 text-lg inline-flex items-center gap-2"
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={fastSpring}
+                  >
+                    Post a Ticket Free
+                    <motion.span whileHover={{ x: 4 }} transition={fastSpring}>
+                      <ArrowRight className="w-5 h-5" />
+                    </motion.span>
+                  </motion.span>
                 </Link>
-                <Link to="/signup" className="gh-btn-secondary px-10 py-4 text-lg">
-                  Create Account
+                <Link to="/signup">
+                  <motion.span 
+                    className="gh-btn-secondary px-10 py-4 text-lg inline-block"
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={fastSpring}
+                  >
+                    Create Account
+                  </motion.span>
                 </Link>
               </div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: 24 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ ...smoothTween, delay: 0.15 }}
               className="hidden md:block"
             >
-              <div className="relative rounded-xl overflow-hidden border border-border shadow-xl">
+              <motion.div 
+                className="relative rounded-xl overflow-hidden border border-border shadow-xl gpu-accelerate"
+                whileHover={{ scale: 1.02, y: -4 }}
+                transition={smoothSpring}
+              >
                 <img 
                   src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=500&h=350&fit=crop"
                   alt="Expert developer ready to help"
                   className="w-full h-auto"
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent pointer-events-none" />
+              </motion.div>
             </motion.div>
           </div>
         </div>

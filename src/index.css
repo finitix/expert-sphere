@@ -79,6 +79,21 @@
     --sidebar-border: 215 28% 16%;
     --sidebar-ring: 140 70% 45%;
   }
+
+  /* Smooth Performance Optimizations */
+  .will-change-transform {
+    will-change: transform;
+  }
+  
+  .will-change-opacity {
+    will-change: opacity;
+  }
+  
+  .gpu-accelerate {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
 }
 
 @layer base {
@@ -88,12 +103,22 @@
 
   html {
     scroll-behavior: smooth;
+    /* Optimize text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Mona Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: hsl(var(--background));
+    /* Reduce layout thrash */
+    overflow-x: hidden;
+  }
+
+  /* Optimize images for smooth loading */
+  img {
+    content-visibility: auto;
   }
 
   h1, h2, h3, h4, h5, h6 {

@@ -5,6 +5,10 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BackgroundBeams, GlowOrbs, GridPattern, AnimatedBorderCard } from "@/components/effects/BackgroundEffects";
 import { SolvedFeed } from "@/components/feed/SolvedFeed";
+import { SEOHead, getOrganizationSchema, getWebsiteSchema, getServiceSchema } from "@/components/seo/SEOHead";
+import { StatsSection } from "@/components/landing/StatsSection";
+import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+import { CategoriesSection } from "@/components/landing/CategoriesSection";
 import { useRef, useState, useEffect, useMemo, useCallback } from "react";
 
 // Optimized easing for silky smooth animations
@@ -236,6 +240,20 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      <SEOHead
+        title="SolvePro - Get Expert Help for Any Problem"
+        description="Connect with verified experts to solve problems in any domain. Technology, business, design, and more. Pay only when your problem is solved. Trusted by 50,000+ users worldwide."
+        keywords="expert help, problem solving, tech support, consulting, verified experts, on-demand help"
+        canonicalUrl="/"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@graph": [
+            getOrganizationSchema(),
+            getWebsiteSchema(),
+            getServiceSchema()
+          ]
+        }}
+      />
       <Navbar />
 
       {/* Hero Section - Side by Side Layout */}
@@ -379,61 +397,25 @@ const Index = () => {
             <p className="text-sm text-muted-foreground mb-8">TRUSTED BY DEVELOPERS AT</p>
             <div className="flex flex-wrap items-center justify-center gap-12 opacity-50">
               {trustedBy.map((company) => (
-                <div key={company.name} className="h-8 grayscale hover:grayscale-0 transition-all">
+                <motion.div 
+                  key={company.name} 
+                  className="h-8 grayscale hover:grayscale-0 transition-all"
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
                   <img src={company.logo} alt={company.name} className="h-full w-auto object-contain invert" />
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Categories Section - with parallax */}
-      <section className="py-24 relative overflow-hidden">
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent"
-          style={{ y: useTransform(scrollYProgress, [0, 1], [0, -100]) }}
-        />
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={smoothTween}
-            className="text-center mb-12"
-          >
-            <span className="gh-badge-blue mb-4 inline-block">Categories</span>
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
-              Get help in <span className="gradient-text-blue">any domain</span>
-            </h2>
-          </motion.div>
+      {/* Stats Section */}
+      <StatsSection />
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {categories.map((cat, i) => (
-              <motion.div
-                key={cat.name}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ ...fastTween, delay: i * 0.05 }}
-                whileHover={{ scale: 1.05, y: -6 }}
-                whileTap={{ scale: 0.98 }}
-                className="gh-card text-center cursor-pointer group gpu-accelerate"
-              >
-                <motion.div 
-                  className={`w-12 h-12 rounded-xl bg-${cat.color}/10 flex items-center justify-center mx-auto mb-3`}
-                  whileHover={{ scale: 1.1, rotate: 6 }}
-                  transition={fastSpring}
-                >
-                  <cat.icon className={`w-6 h-6 text-${cat.color}`} />
-                </motion.div>
-                <p className="font-semibold text-foreground">{cat.name}</p>
-                <p className="text-sm text-muted-foreground">{cat.count} solved</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Categories Section - Enhanced */}
+      <CategoriesSection />
 
       {/* Recently Solved - with staggered animations */}
       <section className="py-24 relative border-t border-border overflow-hidden">
@@ -639,64 +621,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-24 relative">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={smoothTween}
-            className="text-center mb-16"
-          >
-            <span className="gh-badge-primary mb-4 inline-block">Testimonials</span>
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
-              Loved by <span className="gradient-text-green">developers</span>
-            </h2>
-          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {testimonials.map((testimonial, i) => (
-              <motion.div
-                key={testimonial.author}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ ...fastTween, delay: i * 0.08 }}
-                whileHover={{ y: -6 }}
-                className="gh-card gpu-accelerate"
-              >
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, j) => (
-                    <motion.div
-                      key={j}
-                      initial={{ opacity: 0, scale: 0 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ ...fastSpring, delay: i * 0.08 + j * 0.05 }}
-                    >
-                      <Star className="w-4 h-4 text-warning fill-current" />
-                    </motion.div>
-                  ))}
-                </div>
-                <p className="text-foreground mb-6 leading-relaxed">"{testimonial.quote}"</p>
-                <div className="flex items-center gap-3">
-                  <img 
-                    src={testimonial.avatar} 
-                    alt={testimonial.author}
-                    className="w-10 h-10 rounded-full object-cover"
-                    loading="lazy"
-                  />
-                  <div>
-                    <p className="font-medium text-foreground">{testimonial.author}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Enhanced Testimonials */}
+      <TestimonialsSection />
 
       {/* CTA with 3D */}
       <section className="py-32 relative overflow-hidden">

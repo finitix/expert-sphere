@@ -4,6 +4,7 @@ import { Menu, X, Zap, ChevronDown, User, Settings, LogOut, LayoutDashboard } fr
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -39,7 +40,7 @@ export function Navbar() {
               <Zap className="w-4 h-4 text-white" />
             </div>
             <span className="font-display font-semibold text-lg text-foreground">
-              TechSolve
+              SolvePro
             </span>
           </Link>
 
@@ -61,8 +62,9 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Desktop Auth */}
+          {/* Desktop Auth & Theme Toggle */}
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
             {isAuthenticated && user ? (
               <div className="relative">
                 <button
@@ -203,6 +205,12 @@ export function Navbar() {
                     {link.label}
                   </Link>
                 ))}
+
+                {/* Theme toggle for mobile */}
+                <div className="flex items-center justify-between py-2 px-3">
+                  <span className="text-sm text-muted-foreground">Theme</span>
+                  <ThemeToggle />
+                </div>
 
                 <div className="pt-4 mt-4 border-t border-border space-y-2">
                   {isAuthenticated ? (

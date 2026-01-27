@@ -13,7 +13,6 @@ const About = lazy(() => import("@/pages/About"));
 const Login = lazy(() => import("@/pages/Login"));
 const Signup = lazy(() => import("@/pages/Signup"));
 const CreateTicket = lazy(() => import("@/pages/CreateTicket"));
-const Onboarding = lazy(() => import("@/pages/Onboarding"));
 const UserDashboard = lazy(() => import("@/pages/dashboard/UserDashboard"));
 const TrainerDashboard = lazy(() => import("@/pages/dashboard/TrainerDashboard"));
 const AdminDashboard = lazy(() => import("@/pages/dashboard/AdminDashboard"));
@@ -83,7 +82,6 @@ export function AnimatedRoutes() {
       <Suspense fallback={<PageLoader />}>
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageWrapper><Index /></PageWrapper>} />
-          <Route path="/onboarding" element={<PageWrapper><Onboarding /></PageWrapper>} />
           <Route path="/feed" element={<PageWrapper><Feed /></PageWrapper>} />
           <Route path="/trainers" element={<PageWrapper><Trainers /></PageWrapper>} />
           <Route path="/trainer/:username" element={<PageWrapper><TrainerProfile /></PageWrapper>} />

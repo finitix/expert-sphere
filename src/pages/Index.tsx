@@ -9,6 +9,7 @@ import { SEOHead, getOrganizationSchema, getWebsiteSchema, getServiceSchema } fr
 import { StatsSection } from "@/components/landing/StatsSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { CategoriesSection } from "@/components/landing/CategoriesSection";
+import { FirstTimeBanner } from "@/components/landing/FirstTimeBanner";
 import { useRef, useState, useEffect, useMemo, useCallback } from "react";
 
 // Optimized easing for silky smooth animations
@@ -255,6 +256,7 @@ const Index = () => {
         }}
       />
       <Navbar />
+      <FirstTimeBanner />
 
       {/* Hero Section - Side by Side Layout */}
       <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">

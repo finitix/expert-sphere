@@ -12,9 +12,7 @@
 @tailwind utilities;
 
 @layer base {
-  /* Dark theme (default) */
-  :root,
-  .dark {
+  :root {
     /* GitHub Exact Colors */
     --background: 215 28% 5%;
     --background-secondary: 215 28% 7%;
@@ -81,94 +79,6 @@
     --sidebar-border: 215 28% 16%;
     --sidebar-ring: 140 70% 45%;
   }
-
-  /* Light theme */
-  .light {
-    --background: 0 0% 100%;
-    --background-secondary: 210 20% 98%;
-    --background-tertiary: 210 20% 96%;
-    --foreground: 215 25% 15%;
-
-    /* Card & Surface */
-    --card: 0 0% 100%;
-    --card-hover: 210 20% 98%;
-    --card-foreground: 215 25% 15%;
-    --card-border: 215 20% 88%;
-    --card-border-hover: 215 20% 80%;
-
-    /* Popover */
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
-
-    /* Primary - GitHub Green */
-    --primary: 140 70% 40%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 140 70% 40% / 0.3;
-
-    /* Secondary - Copilot Purple */
-    --secondary: 262 83% 55%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-glow: 262 83% 55% / 0.3;
-
-    /* Accent - GitHub Blue */
-    --accent: 212 100% 47%;
-    --accent-foreground: 0 0% 100%;
-    --accent-glow: 212 100% 47% / 0.3;
-
-    /* Success */
-    --success: 140 70% 40%;
-    --success-foreground: 0 0% 100%;
-
-    /* Warning */
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 0%;
-
-    /* Muted */
-    --muted: 210 20% 94%;
-    --muted-foreground: 215 15% 45%;
-
-    /* Destructive */
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-
-    /* Border & Input */
-    --border: 215 20% 88%;
-    --input: 210 20% 96%;
-    --ring: 140 70% 40%;
-
-    /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 215 25% 15%;
-    --sidebar-primary: 140 70% 40%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 20% 96%;
-    --sidebar-accent-foreground: 215 25% 15%;
-    --sidebar-border: 215 20% 88%;
-    --sidebar-ring: 140 70% 40%;
-  }
-
-  /* Smooth theme transition */
-  .theme-transition,
-  .theme-transition *,
-  .theme-transition *::before,
-  .theme-transition *::after {
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, fill 0.3s ease, stroke 0.3s ease, box-shadow 0.3s ease !important;
-  }
-
-  /* Smooth Performance Optimizations */
-  .will-change-transform {
-    will-change: transform;
-  }
-  
-  .will-change-opacity {
-    will-change: opacity;
-  }
-  
-  .gpu-accelerate {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
-  }
 }
 
 @layer base {
@@ -178,22 +88,12 @@
 
   html {
     scroll-behavior: smooth;
-    /* Optimize text rendering */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Mona Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: hsl(var(--background));
-    /* Reduce layout thrash */
-    overflow-x: hidden;
-  }
-
-  /* Optimize images for smooth loading */
-  img {
-    content-visibility: auto;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -528,132 +428,5 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
-  }
-
-  /* Shimmer effect for skeletons */
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
-  }
-
-  .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--muted-foreground) / 0.1) 50%,
-      hsl(var(--muted)) 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s ease-in-out infinite;
-  }
-
-  /* Float animation */
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
-  .float {
-    animation: float 3s ease-in-out infinite;
-  }
-
-  .float-delay-1 {
-    animation: float 3s ease-in-out infinite 0.5s;
-  }
-
-  .float-delay-2 {
-    animation: float 3s ease-in-out infinite 1s;
-  }
-
-  /* Pulse glow effect */
-  @keyframes pulse-glow {
-    0%, 100% {
-      box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
-    }
-    50% {
-      box-shadow: 0 0 40px hsl(var(--primary) / 0.5);
-    }
-  }
-
-  .pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-
-  /* Shadow glow utilities */
-  .shadow-glow-primary {
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
-  }
-
-  .shadow-glow-secondary {
-    box-shadow: 0 0 20px hsl(var(--secondary) / 0.3);
-  }
-
-  .shadow-glow-success {
-    box-shadow: 0 0 20px hsl(var(--success) / 0.3);
-  }
-
-  /* Smooth page transitions */
-  .page-enter {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  .page-enter-active {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 300ms ease-out, transform 300ms ease-out;
-  }
-
-  .page-exit {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .page-exit-active {
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 200ms ease-in, transform 200ms ease-in;
-  }
-
-  /* Section title and subtitle defaults */
-  .section-title {
-    @apply text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground mb-4;
-  }
-
-  .section-subtitle {
-    @apply text-lg text-muted-foreground max-w-2xl mx-auto;
-  }
-
-  /* Avatar ring animation */
-  .avatar-ring {
-    position: relative;
-  }
-
-  .avatar-ring::before {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--primary)));
-    background-size: 200% 200%;
-    animation: borderRotate 3s linear infinite;
-    z-index: -1;
-  }
-
-  /* Gradient backgrounds */
-  .bg-gradient-primary {
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
-  }
-
-  .bg-gradient-radial {
-    background: radial-gradient(circle at center, hsl(var(--primary) / 0.2), transparent 70%);
   }
 }

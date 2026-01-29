@@ -4,10 +4,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BackgroundBeams, GlowOrbs, GridPattern } from "@/components/effects/BackgroundEffects";
 import { Target, Users, Award, Zap, Heart, Globe, CheckCircle2, ArrowRight } from "lucide-react";
-import { SEOHead, getBreadcrumbSchema } from "@/components/seo/SEOHead";
 
 const easeOutExpo = [0.16, 1, 0.3, 1];
-const smoothSpring = { type: "spring", stiffness: 100, damping: 20, mass: 0.5 };
 
 const values = [
   {
@@ -60,25 +58,15 @@ const team = [
 ];
 
 const milestones = [
-  { year: "2021", title: "Founded", description: "SolvePro was born from a simple idea" },
+  { year: "2021", title: "Founded", description: "TechSolve was born from a simple idea" },
   { year: "2022", title: "1,000 Problems Solved", description: "Reached our first major milestone" },
   { year: "2023", title: "Global Expansion", description: "Launched in 50+ countries" },
-  { year: "2024", title: "50,000+ Community", description: "Growing stronger every day" },
+  { year: "2024", title: "10,000+ Community", description: "Growing stronger every day" },
 ];
 
 const About = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      <SEOHead
-        title="About Us - Our Mission & Team"
-        description="Learn about SolvePro's mission to democratize access to expert help. Meet our team and discover our journey from startup to global platform."
-        keywords="about solvepro, our mission, expert platform, developer help, team"
-        canonicalUrl="/about"
-        structuredData={getBreadcrumbSchema([
-          { name: "Home", url: "/" },
-          { name: "About", url: "/about" }
-        ])}
-      />
       <Navbar />
 
       {/* Hero Section */}

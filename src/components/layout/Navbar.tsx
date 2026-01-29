@@ -4,6 +4,7 @@ import { Menu, X, Zap, ChevronDown, User, Settings, LogOut, LayoutDashboard } fr
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -45,24 +46,35 @@ export function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
+            {navLinks.map((link, i) => (
+              <motion.div
                 key={link.href}
-                to={link.href}
-                className={cn(
-                  "px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  location.pathname === link.href
-                    ? "text-foreground bg-muted"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                )}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  delay: i * 0.05, 
+                  duration: 0.4, 
+                  ease: [0.23, 1, 0.32, 1] 
+                }}
               >
-                {link.label}
-              </Link>
+                <Link
+                  to={link.href}
+                  className={cn(
+                    "px-3 py-2 text-sm font-medium rounded-md transition-all duration-300",
+                    location.pathname === link.href
+                      ? "text-foreground bg-muted"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              </motion.div>
             ))}
           </div>
 
-          {/* Desktop Auth */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop Auth + Theme Toggle */}
+          <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             {isAuthenticated && user ? (
               <div className="relative">
                 <button

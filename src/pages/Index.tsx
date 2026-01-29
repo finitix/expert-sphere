@@ -7,7 +7,10 @@ import { BackgroundBeams, GlowOrbs, GridPattern, AnimatedBorderCard } from "@/co
 import { SolvedFeed } from "@/components/feed/SolvedFeed";
 import { useRef, useState, useEffect } from "react";
 
+// Smoother easing curves for buttery animations
 const easeOutExpo = [0.16, 1, 0.3, 1];
+const easeOutQuart = [0.25, 1, 0.5, 1];
+const springConfig = { type: "spring", stiffness: 100, damping: 20 };
 
 // Hero carousel images - tech/problem solving themed
 const heroImages = [
@@ -122,7 +125,7 @@ const categories = [
   { icon: Code2, name: "Other", count: "890", color: "muted" },
 ];
 
-// Hero Carousel Component
+// Hero Carousel Component with ultra-smooth transitions
 const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -140,29 +143,45 @@ const HeroCarousel = () => {
           key={currentIndex}
           src={heroImages[currentIndex].src}
           alt={heroImages[currentIndex].alt}
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.7 }}
+          initial={{ opacity: 0, scale: 1.08, filter: "blur(8px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
+          transition={{ 
+            duration: 0.8, 
+            ease: [0.23, 1, 0.32, 1]
+          }}
           className="w-full h-auto aspect-[4/3] object-cover"
         />
       </AnimatePresence>
-      <div className="absolute inset-0 bg-gradient-to-tr from-background/60 via-transparent to-transparent" />
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-tr from-background/60 via-transparent to-transparent"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      />
       
-      {/* Floating Badge */}
+      {/* Floating Badge with smoother animation */}
       <AnimatePresence mode="wait">
         <motion.div 
           key={`badge-${currentIndex}`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.4 }}
-          className="absolute bottom-4 left-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg p-4 border border-border"
+          initial={{ opacity: 0, y: 30, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 0.95 }}
+          transition={{ 
+            duration: 0.5, 
+            ease: [0.23, 1, 0.32, 1],
+            delay: 0.1
+          }}
+          className="absolute bottom-4 left-4 right-4 bg-background/90 backdrop-blur-md rounded-lg p-4 border border-border"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+            <motion.div 
+              className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center"
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
               <CheckCircle2 className="w-5 h-5 text-success" />
-            </div>
+            </motion.div>
             <div>
               <p className="font-medium text-foreground text-sm">{heroImages[currentIndex].badge.title}</p>
               <p className="text-xs text-muted-foreground">{heroImages[currentIndex].badge.subtitle}</p>
@@ -171,15 +190,20 @@ const HeroCarousel = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Carousel Indicators */}
+      {/* Carousel Indicators with smooth transitions */}
       <div className="absolute top-4 right-4 flex gap-1.5">
         {heroImages.map((_, i) => (
-          <button
+          <motion.button
             key={i}
             onClick={() => setCurrentIndex(i)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              i === currentIndex ? "bg-primary w-6" : "bg-white/50 hover:bg-white/80"
-            }`}
+            className="h-2 rounded-full bg-white/50 hover:bg-white/80"
+            animate={{ 
+              width: i === currentIndex ? 24 : 8,
+              backgroundColor: i === currentIndex ? "rgb(255,255,255)" : "rgba(255,255,255,0.5)"
+            }}
+            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
           />
         ))}
       </div>
@@ -218,93 +242,161 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left Side - Text Content */}
             <div className="text-center lg:text-left">
-              {/* Badge */}
+              {/* Badge with subtle pulse */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: easeOutExpo }}
+                initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
                 className="mb-6"
               >
-                <span className="gh-badge-primary inline-flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5" />
+                <motion.span 
+                  className="gh-badge-primary inline-flex items-center gap-2"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <motion.span
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                  </motion.span>
                   Trusted by 10,000+ developers worldwide
-                </span>
+                </motion.span>
               </motion.div>
 
-              {/* Headline */}
+              {/* Headline with staggered letters */}
               <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.1, ease: easeOutExpo }}
+                initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.9, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
                 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-foreground mb-6 leading-[1.05] tracking-tight"
               >
                 Build with the power of
                 <br />
-                <span className="gradient-text">verified experts</span>
+                <motion.span 
+                  className="gradient-text inline-block"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                >
+                  verified experts
+                </motion.span>
               </motion.h1>
 
               {/* Subheadline */}
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2, ease: easeOutExpo }}
+                initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.8, delay: 0.25, ease: [0.23, 1, 0.32, 1] }}
                 className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
               >
                 Post your tech problem. Get matched with verified trainers.
                 Pay only when it's solved.
               </motion.p>
 
-              {/* CTAs */}
+              {/* CTAs with hover effects */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3, ease: easeOutExpo }}
+                initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.8, delay: 0.35, ease: [0.23, 1, 0.32, 1] }}
                 className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4"
               >
-                <Link to="/create-ticket" className="gh-btn-primary px-8 py-3 text-base group">
-                  Post a Ticket
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-                <Link to="/trainers" className="gh-btn-secondary px-8 py-3 text-base group">
-                  <Play className="w-4 h-4" />
-                  Browse trainers
-                </Link>
+                <motion.div
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <Link to="/create-ticket" className="gh-btn-primary px-8 py-3 text-base group inline-flex items-center gap-2">
+                    Post a Ticket
+                    <motion.span
+                      animate={{ x: [0, 4, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </motion.span>
+                  </Link>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <Link to="/trainers" className="gh-btn-secondary px-8 py-3 text-base group inline-flex items-center gap-2">
+                    <Play className="w-4 h-4" />
+                    Browse trainers
+                  </Link>
+                </motion.div>
               </motion.div>
             </div>
 
             {/* Right Side - Hero Image Carousel */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.4, ease: easeOutExpo }}
+              initial={{ opacity: 0, x: 50, rotateY: -5 }}
+              animate={{ opacity: 1, x: 0, rotateY: 0 }}
+              transition={{ duration: 1, delay: 0.5, ease: [0.23, 1, 0.32, 1] }}
               className="relative"
+              style={{ perspective: "1000px" }}
             >
               <HeroCarousel />
               
-              {/* Decorative Elements */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
-              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />
+              {/* Decorative Elements with floating animation */}
+              <motion.div 
+                className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl"
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  opacity: [0.2, 0.4, 0.2]
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div 
+                className="absolute -bottom-4 -left-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl"
+                animate={{ 
+                  scale: [1.2, 1, 1.2],
+                  opacity: [0.3, 0.15, 0.3]
+                }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              />
             </motion.div>
           </div>
         </motion.div>
       </section>
 
-      {/* Trusted By Section */}
+      {/* Trusted By Section with staggered logos */}
       <section className="py-16 border-y border-border bg-background-secondary/50">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
             className="text-center"
           >
-            <p className="text-sm text-muted-foreground mb-8">TRUSTED BY DEVELOPERS AT</p>
-            <div className="flex flex-wrap items-center justify-center gap-12 opacity-50">
-              {trustedBy.map((company) => (
-                <div key={company.name} className="h-8 grayscale hover:grayscale-0 transition-all">
-                  <img src={company.logo} alt={company.name} className="h-full w-auto object-contain invert" />
-                </div>
+            <motion.p 
+              className="text-sm text-muted-foreground mb-8"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              TRUSTED BY DEVELOPERS AT
+            </motion.p>
+            <div className="flex flex-wrap items-center justify-center gap-12">
+              {trustedBy.map((company, i) => (
+                <motion.div 
+                  key={company.name} 
+                  className="h-8 opacity-50 hover:opacity-100 transition-opacity duration-300"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 0.5, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1, duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                  whileHover={{ scale: 1.1, opacity: 1 }}
+                >
+                  <img 
+                    src={company.logo} 
+                    alt={company.name} 
+                    className="h-full w-auto object-contain dark:invert transition-all duration-300 grayscale hover:grayscale-0" 
+                  />
+                </motion.div>
               ))}
             </div>
           </motion.div>
@@ -319,13 +411,19 @@ const Index = () => {
         />
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: easeOutExpo }}
+            transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1] }}
             className="text-center mb-12"
           >
-            <span className="gh-badge-blue mb-4 inline-block">Categories</span>
+            <motion.span 
+              className="gh-badge-blue mb-4 inline-block"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              Categories
+            </motion.span>
             <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
               Get help in <span className="gradient-text-blue">any domain</span>
             </h2>
@@ -335,16 +433,29 @@ const Index = () => {
             {categories.map((cat, i) => (
               <motion.div
                 key={cat.name}
-                initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                initial={{ opacity: 0, y: 50, scale: 0.85 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.08, ease: easeOutExpo }}
-                whileHover={{ scale: 1.08, y: -8, rotateY: 5 }}
+                transition={{ 
+                  duration: 0.7, 
+                  delay: i * 0.08, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}
+                whileHover={{ 
+                  scale: 1.08, 
+                  y: -10,
+                  transition: { type: "spring", stiffness: 300, damping: 20 }
+                }}
+                whileTap={{ scale: 0.98 }}
                 className="gh-card text-center cursor-pointer group"
               >
-                <div className={`w-12 h-12 rounded-xl bg-${cat.color}/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                <motion.div 
+                  className={`w-12 h-12 rounded-xl bg-${cat.color}/10 flex items-center justify-center mx-auto mb-3`}
+                  whileHover={{ scale: 1.15, rotate: 8 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                >
                   <cat.icon className={`w-6 h-6 text-${cat.color}`} />
-                </div>
+                </motion.div>
                 <p className="font-semibold text-foreground">{cat.name}</p>
                 <p className="text-sm text-muted-foreground">{cat.count} solved</p>
               </motion.div>
@@ -547,17 +658,23 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Testimonials with smooth card animations */}
       <section className="py-24 relative">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: easeOutExpo }}
+            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
             className="text-center mb-16"
           >
-            <span className="gh-badge-primary mb-4 inline-block">Testimonials</span>
+            <motion.span 
+              className="gh-badge-primary mb-4 inline-block"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              Testimonials
+            </motion.span>
             <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
               Loved by <span className="gradient-text-green">developers</span>
             </h2>
@@ -567,23 +684,42 @@ const Index = () => {
             {testimonials.map((testimonial, i) => (
               <motion.div
                 key={testimonial.author}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+                transition={{ 
+                  duration: 0.7, 
+                  delay: i * 0.12,
+                  ease: [0.23, 1, 0.32, 1]
+                }}
+                whileHover={{ 
+                  y: -8, 
+                  scale: 1.02,
+                  transition: { type: "spring", stiffness: 300, damping: 20 }
+                }}
                 className="gh-card"
               >
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 text-warning fill-current" />
+                    <motion.div
+                      key={j}
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.12 + j * 0.05, type: "spring", stiffness: 400 }}
+                    >
+                      <Star className="w-4 h-4 text-warning fill-current" />
+                    </motion.div>
                   ))}
                 </div>
                 <p className="text-foreground mb-6 leading-relaxed">"{testimonial.quote}"</p>
                 <div className="flex items-center gap-3">
-                  <img 
+                  <motion.img 
                     src={testimonial.avatar} 
                     alt={testimonial.author}
                     className="w-10 h-10 rounded-full object-cover"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   />
                   <div>
                     <p className="font-medium text-foreground">{testimonial.author}</p>
@@ -596,7 +732,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA with 3D */}
+      {/* CTA with enhanced animations */}
       <section className="py-32 relative overflow-hidden">
         <div className="absolute inset-0">
           <GlowOrbs />
@@ -606,45 +742,99 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, x: -50, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1] }}
             >
-              <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-6 leading-tight">
+              <motion.h2 
+                className="text-4xl md:text-5xl font-display font-bold text-foreground mb-6 leading-tight"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
+              >
                 Ready to solve your
                 <br />
-                <span className="gradient-text">tech problems?</span>
-              </h2>
-              <p className="text-xl text-muted-foreground mb-8">
+                <motion.span 
+                  className="gradient-text inline-block"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                >
+                  tech problems?
+                </motion.span>
+              </motion.h2>
+              <motion.p 
+                className="text-xl text-muted-foreground mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
+              >
                 Join thousands of developers getting expert help every day.
-              </p>
-              <div className="flex flex-col sm:flex-row items-start gap-4">
-                <Link to="/create-ticket" className="gh-btn-primary px-10 py-4 text-lg group">
-                  Post a Ticket Free
-                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                </Link>
-                <Link to="/signup" className="gh-btn-secondary px-10 py-4 text-lg">
-                  Create Account
-                </Link>
-              </div>
+              </motion.p>
+              <motion.div 
+                className="flex flex-col sm:flex-row items-start gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.03, y: -3 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <Link to="/create-ticket" className="gh-btn-primary px-10 py-4 text-lg inline-flex items-center gap-2">
+                    Post a Ticket Free
+                    <motion.span
+                      animate={{ x: [0, 5, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <ArrowRight className="w-5 h-5" />
+                    </motion.span>
+                  </Link>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.03, y: -3 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  <Link to="/signup" className="gh-btn-secondary px-10 py-4 text-lg">
+                    Create Account
+                  </Link>
+                </motion.div>
+              </motion.div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, x: 50, rotateY: -10 }}
+              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 1, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
               className="hidden md:block"
+              style={{ perspective: "1000px" }}
             >
-              <div className="relative rounded-xl overflow-hidden border border-border shadow-xl">
+              <motion.div 
+                className="relative rounded-xl overflow-hidden border border-border shadow-xl"
+                whileHover={{ scale: 1.03, rotateY: 5 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              >
                 <img 
                   src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=500&h=350&fit=crop"
                   alt="Expert developer ready to help"
-                  className="w-full h-auto"
+                  className="w-full h-auto transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
-              </div>
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                />
+              </motion.div>
             </motion.div>
           </div>
         </div>

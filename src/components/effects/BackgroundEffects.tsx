@@ -1,15 +1,11 @@
-import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { memo } from "react";
 
-export function BackgroundBeams({ className = "" }: { className?: string }) {
+// Memoized to prevent re-renders
+export const BackgroundBeams = memo(function BackgroundBeams({ className = "" }: { className?: string }) {
   const paths = [
     "M-380 -189C-380 -189 -312 216 152 343C616 470 684 875 684 875",
     "M-373 -197C-373 -197 -305 208 159 335C623 462 691 867 691 867",
     "M-366 -205C-366 -205 -298 200 166 327C630 454 698 859 698 859",
-    "M-359 -213C-359 -213 -291 192 173 319C637 446 705 851 705 851",
-    "M-352 -221C-352 -221 -284 184 180 311C644 438 712 843 712 843",
-    "M-345 -229C-345 -229 -277 176 187 303C651 430 719 835 719 835",
-    "M-338 -237C-338 -237 -270 168 194 295C658 422 726 827 726 827",
   ];
 
   return (
@@ -28,81 +24,69 @@ export function BackgroundBeams({ className = "" }: { className?: string }) {
           </linearGradient>
         </defs>
         {paths.map((path, i) => (
-          <motion.path
+          <path
             key={i}
             d={path}
             stroke="url(#beam-gradient)"
             strokeWidth="0.5"
-            strokeOpacity={0.2 - i * 0.02}
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{
-              duration: 3,
-              delay: i * 0.2,
-              repeat: Infinity,
-              repeatType: "loop",
-              ease: "linear",
+            strokeOpacity={0.15 - i * 0.03}
+            className="animate-[beam-draw_4s_ease-in-out_infinite]"
+            style={{ 
+              animationDelay: `${i * 0.3}s`,
+              strokeDasharray: 1000,
+              strokeDashoffset: 1000,
             }}
           />
         ))}
       </svg>
+      <style>{`
+        @keyframes beam-draw {
+          0%, 100% { stroke-dashoffset: 1000; }
+          50% { stroke-dashoffset: 0; }
+        }
+      `}</style>
     </div>
   );
-}
+});
 
-export function GlowOrbs() {
+// Optimized glow orbs using CSS animations instead of framer-motion
+export const GlowOrbs = memo(function GlowOrbs() {
   return (
     <>
-      <motion.div
-        className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-30 blur-[120px]"
-        style={{ background: "hsl(140 70% 45% / 0.15)" }}
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.2, 0.35, 0.2],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
+      <div
+        className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full blur-[120px] animate-pulse will-change-[opacity]"
+        style={{ 
+          background: "hsl(140 70% 45% / 0.12)",
+          animationDuration: '8s',
         }}
       />
-      <motion.div
-        className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full opacity-20 blur-[100px]"
-        style={{ background: "hsl(262 83% 58% / 0.12)" }}
-        animate={{
-          scale: [1.1, 1, 1.1],
-          opacity: [0.15, 0.25, 0.15],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
+      <div
+        className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full blur-[100px] animate-pulse will-change-[opacity]"
+        style={{ 
+          background: "hsl(262 83% 58% / 0.08)",
+          animationDuration: '10s',
+          animationDelay: '2s',
         }}
       />
-      <motion.div
-        className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full opacity-15 blur-[80px]"
-        style={{ background: "hsl(212 100% 50% / 0.1)" }}
-        animate={{
-          scale: [1, 1.15, 1],
-          opacity: [0.1, 0.2, 0.1],
-        }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut",
+      <div
+        className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[80px] animate-pulse will-change-[opacity]"
+        style={{ 
+          background: "hsl(212 100% 50% / 0.06)",
+          animationDuration: '12s',
+          animationDelay: '4s',
         }}
       />
     </>
   );
-}
+});
 
-export function GridPattern() {
+export const GridPattern = memo(function GridPattern() {
   return (
     <div className="absolute inset-0 grid-pattern opacity-30 pointer-events-none" />
   );
-}
+});
 
-export function AnimatedBorderCard({ 
+export const AnimatedBorderCard = memo(function AnimatedBorderCard({ 
   children, 
   className = "" 
 }: { 
@@ -116,4 +100,4 @@ export function AnimatedBorderCard({
       </div>
     </div>
   );
-}
+});

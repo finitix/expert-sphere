@@ -24,7 +24,6 @@ export function Navbar() {
   const getDashboardLink = () => {
     if (!user) return "/login";
     switch (user.role) {
-      case "admin": return "/admin";
       case "trainer": return "/trainer";
       default: return "/dashboard";
     }
@@ -128,7 +127,7 @@ export function Navbar() {
                         <p className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                           Switch Role (Demo)
                         </p>
-                        {(["user", "trainer", "admin"] as const).map((role) => (
+                        {(["user", "trainer"] as const).map((role) => (
                           <button
                             key={role}
                             onClick={() => {

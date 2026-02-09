@@ -94,8 +94,8 @@ const Login = () => {
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                 Quick Demo Access
               </p>
-              <div className="grid grid-cols-3 gap-2">
-                {(["user", "trainer", "admin"] as const).map((role) => (
+              <div className="grid grid-cols-2 gap-2">
+                {(["user", "trainer"] as const).map((role) => (
                   <button
                     key={role}
                     onClick={() => handleDemoLogin(role)}

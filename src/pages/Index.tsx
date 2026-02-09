@@ -5,7 +5,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BackgroundBeams, GlowOrbs, GridPattern, AnimatedBorderCard } from "@/components/effects/BackgroundEffects";
 import { SolvedFeed } from "@/components/feed/SolvedFeed";
-import { RoboHero } from "@/components/landing/RoboHero";
 import { useRef, useState, useEffect, memo, useMemo } from "react";
 
 // Optimized easing - use CSS-friendly curves for GPU acceleration
@@ -216,8 +215,98 @@ const Index = () => {
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
 
-      {/* 3D Robot Hero Section */}
-      <RoboHero />
+      {/* Hero Section - Side by Side Layout */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 pointer-events-none">
+          <GlowOrbs />
+          <BackgroundBeams />
+          <GridPattern />
+        </div>
+
+        <motion.div
+          style={{ opacity: heroOpacity }}
+          className="container mx-auto px-4 relative z-10 pt-24 pb-16 will-change-[opacity]"
+        >
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left Side - Text Content */}
+            <div className="text-center lg:text-left">
+              {/* Badge - optimized animation */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: fastEase }}
+                className="mb-6"
+              >
+                <span className="gh-badge-primary inline-flex items-center gap-2 hover:scale-105 transition-transform duration-200">
+                  <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                  Trusted by 10,000+ developers worldwide
+                </span>
+              </motion.div>
+
+              {/* Headline - optimized */}
+              <motion.h1
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.08, ease: fastEase }}
+                className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-foreground mb-6 leading-[1.05] tracking-tight"
+              >
+                Build with the power of
+                <br />
+                <span className="gradient-text">verified experts</span>
+              </motion.h1>
+
+              {/* Subheadline */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.15, ease: fastEase }}
+                className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
+              >
+                Post your tech problem. Get matched with verified trainers.
+                Pay only when it's solved.
+              </motion.p>
+
+              {/* CTAs - simplified hover */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2, ease: fastEase }}
+                className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4"
+              >
+                <Link 
+                  to="/create-ticket" 
+                  className="gh-btn-primary px-8 py-3 text-base group inline-flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
+                >
+                  Post a Ticket
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                </Link>
+                <Link 
+                  to="/trainers" 
+                  className="gh-btn-secondary px-8 py-3 text-base group inline-flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
+                >
+                  <Play className="w-4 h-4" />
+                  Browse trainers
+                </Link>
+              </motion.div>
+            </div>
+
+            {/* Right Side - Hero Image Carousel */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: smoothEase }}
+              className="relative"
+            >
+              <HeroCarousel />
+              
+              {/* Decorative Elements - CSS animations for perf */}
+              <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl animate-pulse" />
+              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
 
       {/* Trusted By Section - simplified animations */}
       <section className="py-16 border-y border-border bg-background-secondary/50">

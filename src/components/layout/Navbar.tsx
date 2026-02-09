@@ -19,12 +19,13 @@ export function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout, switchRole } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const getDashboardLink = () => {
     if (!user) return "/login";
     switch (user.role) {
       case "trainer": return "/trainer";
+      case "admin": return "/admin";
       default: return "/dashboard";
     }
   };
@@ -50,11 +51,7 @@ export function Navbar() {
                 key={link.href}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  delay: i * 0.05, 
-                  duration: 0.4, 
-                  ease: [0.23, 1, 0.32, 1] 
-                }}
+                transition={{ delay: i * 0.05, duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
               >
                 <Link
                   to={link.href}
@@ -114,37 +111,13 @@ export function Navbar() {
                           Dashboard
                         </Link>
                         <Link
-                          to="/settings"
+                          to={`${getDashboardLink()}/settings`}
                           onClick={() => setShowUserMenu(false)}
                           className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
                         >
                           <Settings className="w-4 h-4" />
                           Settings
                         </Link>
-                      </div>
-
-                      <div className="py-1 border-t border-border">
-                        <p className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                          Switch Role (Demo)
-                        </p>
-                        {(["user", "trainer"] as const).map((role) => (
-                          <button
-                            key={role}
-                            onClick={() => {
-                              switchRole(role);
-                              setShowUserMenu(false);
-                            }}
-                            className={cn(
-                              "w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors",
-                              user.role === role
-                                ? "bg-primary/10 text-primary"
-                                : "text-foreground hover:bg-muted"
-                            )}
-                          >
-                            <User className="w-4 h-4" />
-                            {role.charAt(0).toUpperCase() + role.slice(1)}
-                          </button>
-                        ))}
                       </div>
 
                       <div className="py-1 border-t border-border">

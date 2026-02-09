@@ -10,6 +10,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { BackgroundBeams, GlowOrbs } from "@/components/effects/BackgroundEffects";
 import { useAuth } from "@/contexts/AuthContext";
+import { ticketService } from "@/services/tickets";
+import { toast } from "sonner";
 
 const categories = [
   { id: "frontend", icon: Globe, label: "Frontend", color: "primary" },
@@ -54,9 +56,12 @@ const CreateTicket = () => {
     customBudget: "",
   });
 
-  // Auto-login for demo
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    login("user");
+    navigate("/login", { state: { from: { pathname: "/create-ticket" } } });
+    return null;
   }
 
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 4));
@@ -78,9 +83,23 @@ const CreateTicket = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    // Demo: just navigate to dashboard
-    navigate("/dashboard");
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const budgetMap: Record<string, number> = { small: 50, medium: 100, large: 300, custom: Number(formData.customBudget) || 0 };
+      await ticketService.create({
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        budget: budgetMap[formData.budget] || 100,
+      });
+      toast.success("Ticket created successfully!");
+      navigate("/dashboard/tickets");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to create ticket");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isStepValid = () => {

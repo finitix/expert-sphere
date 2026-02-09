@@ -2,20 +2,8 @@ import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
-  Zap, 
-  LayoutDashboard, 
-  Ticket, 
-  MessageSquare, 
-  Wallet, 
-  Settings, 
-  Users, 
-  BadgeCheck,
-  TrendingUp,
-  Shield,
-  LogOut,
-  Bell,
-  ChevronDown,
-  Plus
+  Zap, LayoutDashboard, Ticket, MessageSquare, Wallet, Settings, 
+  Users, BadgeCheck, TrendingUp, Shield, LogOut, Bell, Plus
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -51,7 +39,7 @@ const adminNavItems = [
 ];
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -77,9 +65,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
-            <span className="font-display font-bold text-lg text-foreground">
-              TechSolve
-            </span>
+            <span className="font-display font-bold text-lg text-foreground">TechSolve</span>
           </Link>
         </div>
 
@@ -109,10 +95,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <Link
                 key={item.href}
                 to={item.href}
-                className={cn(
-                  "sidebar-link",
-                  isActive && "active"
-                )}
+                className={cn("sidebar-link", isActive && "active")}
               >
                 <item.icon className="w-4 h-4" />
                 {item.label}
@@ -120,29 +103,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             );
           })}
         </nav>
-
-        {/* Role Switcher (Demo) */}
-        <div className="p-3 border-t border-border">
-          <p className="px-3 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            Demo: Switch Role
-          </p>
-          <div className="flex gap-1">
-            {(["user", "trainer"] as const).map((role) => (
-              <button
-                key={role}
-                onClick={() => switchRole(role)}
-                className={cn(
-                  "flex-1 py-1.5 text-xs font-medium rounded transition-colors",
-                  user?.role === role
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {role.charAt(0).toUpperCase() + role.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Logout */}
         <div className="p-3 border-t border-border">

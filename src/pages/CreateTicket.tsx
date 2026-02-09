@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -59,8 +59,13 @@ const CreateTicket = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: { pathname: "/create-ticket" } } });
+    }
+  }, [isAuthenticated, navigate]);
+
   if (!isAuthenticated) {
-    navigate("/login", { state: { from: { pathname: "/create-ticket" } } });
     return null;
   }
 

@@ -127,7 +127,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             Demo: Switch Role
           </p>
           <div className="flex gap-1">
-            {(["user", "trainer", "admin"] as const).map((role) => (
+            {(["user", "trainer"] as const).map((role) => (
               <button
                 key={role}
                 onClick={() => switchRole(role)}

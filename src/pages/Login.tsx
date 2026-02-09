@@ -1,32 +1,43 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff, Zap, ArrowRight, Github } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Zap, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+type LoginRole = "user" | "trainer";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<LoginRole>("user");
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Demo: Log in as user
-    login("user");
-    navigate("/dashboard");
-  };
-
-  const handleDemoLogin = (role: "user" | "trainer" | "admin") => {
-    login(role);
-    const routes = {
-      user: "/dashboard",
-      trainer: "/trainer",
-      admin: "/admin",
-    };
-    navigate(routes[role]);
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await login(email, password, role);
+      toast.success("Login successful!");
+      const redirectTo = from || (role === "trainer" ? "/trainer" : "/dashboard");
+      navigate(redirectTo, { replace: true });
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,8 +59,8 @@ const Login = () => {
             <div className="space-y-4">
               {[
                 "Access your active tickets",
-                "Chat with trainers",
-                "Track your payments",
+                "Chat with trainers in real-time",
+                "Track your payments securely",
               ].map((item, i) => (
                 <motion.div
                   key={item}
@@ -89,31 +100,22 @@ const Login = () => {
               </p>
             </div>
 
-            {/* Demo Login Buttons */}
-            <div className="mb-6 p-4 rounded-lg bg-muted/50 border border-border">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                Quick Demo Access
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {(["user", "trainer"] as const).map((role) => (
-                  <button
-                    key={role}
-                    onClick={() => handleDemoLogin(role)}
-                    className="btn-secondary py-2 text-xs capitalize"
-                  >
-                    {role}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative mb-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border"></div>
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="px-2 bg-background text-muted-foreground">or continue with email</span>
-              </div>
+            {/* Role Toggle */}
+            <div className="flex rounded-lg bg-muted p-1 mb-6">
+              {(["user", "trainer"] as const).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setRole(r)}
+                  className={cn(
+                    "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all",
+                    role === r
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {r === "user" ? "Student" : "Teacher"}
+                </button>
+              ))}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -126,6 +128,7 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
+                    required
                     className="input-field pl-10"
                   />
                 </div>
@@ -145,6 +148,7 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
+                    required
                     className="input-field pl-10 pr-10"
                   />
                   <button
@@ -157,28 +161,21 @@ const Login = () => {
                 </div>
               </div>
 
-              <button type="submit" className="w-full btn-primary py-2.5">
-                Sign in
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full btn-primary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                    Signing in...
+                  </span>
+                ) : (
+                  `Sign in as ${role === "user" ? "Student" : "Teacher"}`
+                )}
               </button>
             </form>
-
-            <div className="mt-6">
-              <div className="relative mb-4">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="px-2 bg-background text-muted-foreground">or</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md bg-muted border border-border text-foreground hover:bg-muted/80 transition-colors text-sm font-medium">
-                  <Github className="w-4 h-4" />
-                  Continue with GitHub
-                </button>
-              </div>
-            </div>
 
             <p className="mt-6 text-center text-xs text-muted-foreground">
               By signing in, you agree to our{" "}

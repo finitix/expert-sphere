@@ -1,26 +1,73 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff, User, Zap, Github, Check } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User, Zap, Check, KeyRound } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { PageTransition } from "@/components/layout/PageTransition";
-import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+
+type Step = "form" | "otp";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [userType, setUserType] = useState<"user" | "trainer">("user");
+  const [step, setStep] = useState<Step>("form");
+  const [otp, setOtp] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
-  const { login } = useAuth();
+  const { signup, verifyOtp, resendOtp } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(userType);
-    navigate(userType === "trainer" ? "/trainer" : "/dashboard");
+    if (!formData.name || !formData.email || !formData.password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await signup(formData.name, formData.email, formData.password);
+      toast.success("Account created! Check your email for the verification code.");
+      setStep("otp");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Signup failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp) {
+      toast.error("Please enter the OTP code");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await verifyOtp(formData.email, otp);
+      toast.success("Email verified! Welcome to TechSolve!");
+      navigate("/dashboard", { replace: true });
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Invalid OTP");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      await resendOtp(formData.email);
+      toast.success("New OTP sent to your email!");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to resend OTP");
+    }
   };
 
   return (
@@ -37,119 +84,162 @@ const Signup = () => {
                 </div>
                 <span className="font-display font-bold text-xl text-foreground">TechSolve</span>
               </Link>
-              <h2 className="text-2xl font-display font-bold text-foreground mb-2">Create an account</h2>
+              <h2 className="text-2xl font-display font-bold text-foreground mb-2">
+                {step === "otp" ? "Verify Your Email" : "Create an account"}
+              </h2>
               <p className="text-muted-foreground">
-                Already have an account?{" "}
-                <Link to="/login" className="text-primary hover:underline">Sign in</Link>
+                {step === "otp" ? (
+                  <>We sent a 6-digit code to <strong className="text-foreground">{formData.email}</strong></>
+                ) : (
+                  <>Already have an account?{" "}
+                  <Link to="/login" className="text-primary hover:underline">Sign in</Link></>
+                )}
               </p>
             </div>
 
-            {/* User Type Toggle */}
-            <div className="flex rounded-lg bg-muted p-1 mb-6">
-              <button
-                onClick={() => setUserType("user")}
-                className={cn(
-                  "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all",
-                  userType === "user"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                I need help
-              </button>
-              <button
-                onClick={() => setUserType("trainer")}
-                className={cn(
-                  "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all",
-                  userType === "trainer"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                I'm an expert
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Full name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="John Doe"
-                    className="input-field pl-10"
-                  />
+            {step === "form" ? (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Full name</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="John Doe"
+                      required
+                      className="input-field pl-10"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="you@example.com"
-                    className="input-field pl-10"
-                  />
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="you@example.com"
+                      required
+                      className="input-field pl-10"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="••••••••"
-                    className="input-field pl-10 pr-10"
-                  />
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Password</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="••••••••"
+                      required
+                      minLength={6}
+                      className="input-field pl-10 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Minimum 6 characters</p>
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <input type="checkbox" id="terms" required className="mt-1 rounded border-border" />
+                  <label htmlFor="terms" className="text-sm text-muted-foreground">
+                    I agree to the{" "}
+                    <Link to="/terms" className="text-primary hover:underline">Terms</Link>
+                    {" "}and{" "}
+                    <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full btn-primary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                      Creating account...
+                    </span>
+                  ) : (
+                    "Create Account"
+                  )}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
+                    <KeyRound className="w-8 h-8 text-primary" />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block text-center">
+                      Enter verification code
+                    </label>
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="000000"
+                      maxLength={6}
+                      required
+                      className="input-field text-center tracking-[0.5em] text-2xl font-mono w-full"
+                    />
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      Code expires in 10 minutes
+                    </p>
+                  </div>
+                </motion.div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading || otp.length < 6}
+                  className="w-full btn-primary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                      Verifying...
+                    </span>
+                  ) : (
+                    "Verify Email"
+                  )}
+                </button>
+
+                <div className="text-center space-y-2">
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={handleResendOtp}
+                    className="text-sm text-primary hover:underline"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    Resend code
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStep("form")}
+                    className="block w-full text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    Back to signup
                   </button>
                 </div>
-              </div>
-
-              <div className="flex items-start gap-2">
-                <input type="checkbox" id="terms" className="mt-1 rounded border-border" />
-                <label htmlFor="terms" className="text-sm text-muted-foreground">
-                  I agree to the{" "}
-                  <Link to="/terms" className="text-primary hover:underline">Terms</Link>
-                  {" "}and{" "}
-                  <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
-                </label>
-              </div>
-
-              <button type="submit" className="w-full btn-primary py-2.5">
-                {userType === "trainer" ? "Apply as Trainer" : "Create Account"}
-              </button>
-            </form>
-
-            <div className="mt-6">
-              <div className="relative mb-4">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="px-2 bg-background text-muted-foreground">or</span>
-                </div>
-              </div>
-
-              <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md bg-muted border border-border text-foreground hover:bg-muted/80 transition-colors text-sm font-medium">
-                <Github className="w-4 h-4" />
-                Continue with GitHub
-              </button>
-            </div>
+              </form>
+            )}
           </div>
         </div>
 
@@ -157,24 +247,16 @@ const Signup = () => {
         <div className="hidden lg:flex lg:w-1/2 bg-background-secondary border-l border-border items-center justify-center p-12">
           <div className="max-w-md">
             <h2 className="text-2xl font-display font-bold text-foreground mb-6">
-              {userType === "trainer" ? "Join as an Expert" : "Start Solving Problems"}
+              Start Solving Problems
             </h2>
             
             <div className="space-y-4">
-              {(userType === "trainer"
-                ? [
-                    "Set your own rates",
-                    "Choose your projects",
-                    "Get paid securely",
-                    "Build your reputation",
-                  ]
-                : [
-                    "Post problems for free",
-                    "Get matched with experts",
-                    "Pay only when solved",
-                    "Secure payment protection",
-                  ]
-              ).map((item, i) => (
+              {[
+                "Post problems for free",
+                "Get matched with experts",
+                "Real-time chat with teachers",
+                "Secure payment protection",
+              ].map((item, i) => (
                 <motion.div
                   key={item}
                   initial={{ opacity: 0, x: 20 }}

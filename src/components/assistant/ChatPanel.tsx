@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Send, Bot, User, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { EmojiEmotion } from "./EmojiAssistant";
 
 interface Message {
   role: "user" | "assistant";
@@ -15,7 +16,42 @@ const PRETRAINED: Record<string, string> = {
   how: "Post a problem → Get matched with experts → They solve it → Pay only when solved. Simple!",
   hello: "Hello! 👋 I'm your AI assistant. I can help with tickets, finding trainers, or answering questions about the platform.",
   hi: "Hi there! 👋 How can I help you today?",
+  thanks: "You're welcome! 😊 Happy to help anytime!",
+  bye: "Goodbye! 👋 Come back anytime you need help!",
+  love: "Aww, that's so sweet! ❤️ I love helping you too!",
+  wow: "Right?! 🤩 Pretty amazing stuff!",
+  sad: "I'm sorry to hear that 😢 Let me know how I can help make things better.",
+  angry: "I understand your frustration 😤 Let me help resolve this for you.",
+  scared: "Don't worry, I'm here to help! 💪 Everything will be fine.",
+  confused: "No worries, let me explain things more clearly! 🤔",
+  funny: "Haha! 😂 Good one! But seriously, how can I help?",
 };
+
+// Keyword → emotion mapping
+const KEYWORD_EMOTIONS: Array<{ keywords: string[]; emotion: EmojiEmotion }> = [
+  { keywords: ["wow", "amazing", "incredible", "awesome", "cool", "great", "fantastic"], emotion: "surprised" },
+  { keywords: ["confused", "don't understand", "what", "huh", "unclear", "explain"], emotion: "confused" },
+  { keywords: ["bye", "goodbye", "night", "sleep", "later", "gtg"], emotion: "sleeping" },
+  { keywords: ["sad", "unhappy", "disappointed", "bad", "terrible", "awful"], emotion: "sad" },
+  { keywords: ["cry", "crying", "sob", "tears", "heartbroken"], emotion: "cry" },
+  { keywords: ["scared", "afraid", "fear", "worried", "anxious", "nervous"], emotion: "fear" },
+  { keywords: ["angry", "mad", "furious", "annoyed", "frustrated", "hate"], emotion: "angry" },
+  { keywords: ["love", "heart", "adore", "sweet", "cute", "❤"], emotion: "love" },
+  { keywords: ["haha", "lol", "lmao", "funny", "hilarious", "joke", "😂"], emotion: "laughing" },
+  { keywords: ["think", "hmm", "wondering", "consider", "maybe"], emotion: "thinking" },
+  { keywords: ["thanks", "thank", "appreciate", "grateful"], emotion: "friendly" },
+  { keywords: ["hi", "hello", "hey", "sup", "yo", "wave"], emotion: "waving" },
+  { keywords: ["excited", "yay", "woohoo", "can't wait", "!!!"], emotion: "excited" },
+  { keywords: ["sunglasses", "swag", "style", "smooth", "chill"], emotion: "cool" },
+];
+
+function detectEmotion(input: string): EmojiEmotion {
+  const lower = input.toLowerCase();
+  for (const { keywords, emotion } of KEYWORD_EMOTIONS) {
+    if (keywords.some(k => lower.includes(k))) return emotion;
+  }
+  return "thinking";
+}
 
 function getResponse(input: string): string {
   const lower = input.toLowerCase();
@@ -48,15 +84,20 @@ export function ChatPanel({ open, onClose, onEmotionChange }: ChatPanelProps) {
     const userMsg: Message = { role: "user", content: input.trim() };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
-    onEmotionChange?.("thinking");
+
+    // Detect emotion from user message
+    const detectedEmotion = detectEmotion(userMsg.content);
+    onEmotionChange?.(detectedEmotion);
     setIsTyping(true);
 
     setTimeout(() => {
       const response = getResponse(userMsg.content);
       setMessages((prev) => [...prev, { role: "assistant", content: response }]);
       setIsTyping(false);
-      onEmotionChange?.("friendly");
-      setTimeout(() => onEmotionChange?.("idle"), 3000);
+      // Response emotion
+      const responseEmotion = detectEmotion(response);
+      onEmotionChange?.(responseEmotion === "thinking" ? "friendly" : responseEmotion);
+      setTimeout(() => onEmotionChange?.("idle"), 4000);
     }, 800 + Math.random() * 600);
   };
 
@@ -66,23 +107,23 @@ export function ChatPanel({ open, onClose, onEmotionChange }: ChatPanelProps) {
     <div
       className={cn(
         "fixed bottom-24 right-6 z-[10001] w-[380px] max-w-[calc(100vw-2rem)] rounded-2xl overflow-hidden",
-        "bg-[#0d1117]/90 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50",
+        "bg-card/90 backdrop-blur-xl border border-border shadow-2xl shadow-black/50",
         "animate-scale-in"
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/[0.03]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-primary-foreground" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">AI Assistant</p>
-            <p className="text-[10px] text-emerald-400">Online</p>
+            <p className="text-sm font-semibold text-foreground">AI Assistant</p>
+            <p className="text-[10px] text-primary">Online</p>
           </div>
         </div>
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/10 transition-colors">
-          <X className="w-4 h-4 text-white/60" />
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-muted transition-colors">
+          <X className="w-4 h-4 text-muted-foreground" />
         </button>
       </div>
 
@@ -92,21 +133,21 @@ export function ChatPanel({ open, onClose, onEmotionChange }: ChatPanelProps) {
           <div key={i} className={cn("flex gap-2", msg.role === "user" && "flex-row-reverse")}>
             <div className={cn(
               "w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1",
-              msg.role === "assistant" ? "bg-emerald-500/20" : "bg-blue-500/20"
+              msg.role === "assistant" ? "bg-primary/20" : "bg-secondary/20"
             )}>
-              {msg.role === "assistant" ? <Bot className="w-3 h-3 text-emerald-400" /> : <User className="w-3 h-3 text-blue-400" />}
+              {msg.role === "assistant" ? <Bot className="w-3 h-3 text-primary" /> : <User className="w-3 h-3 text-secondary" />}
             </div>
             <div className={cn(
               "max-w-[80%] px-3 py-2 rounded-xl text-sm leading-relaxed",
               msg.role === "assistant"
-                ? "bg-white/[0.06] text-white/90 rounded-tl-sm"
-                : "bg-emerald-500/20 text-white rounded-tr-sm"
+                ? "bg-muted/50 text-foreground rounded-tl-sm"
+                : "bg-primary/20 text-foreground rounded-tr-sm"
             )}>
               {msg.content.split("\n").map((line, j) => (
                 <p key={j} className={j > 0 ? "mt-1" : ""}>
                   {line.split(/(\*\*.*?\*\*)/).map((part, k) =>
                     part.startsWith("**") && part.endsWith("**") ? (
-                      <strong key={k} className="text-emerald-400 font-semibold">{part.slice(2, -2)}</strong>
+                      <strong key={k} className="text-primary font-semibold">{part.slice(2, -2)}</strong>
                     ) : (
                       <span key={k}>{part}</span>
                     )
@@ -118,13 +159,13 @@ export function ChatPanel({ open, onClose, onEmotionChange }: ChatPanelProps) {
         ))}
         {isTyping && (
           <div className="flex gap-2">
-            <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-              <Bot className="w-3 h-3 text-emerald-400" />
+            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+              <Bot className="w-3 h-3 text-primary" />
             </div>
-            <div className="bg-white/[0.06] px-3 py-2 rounded-xl rounded-tl-sm">
+            <div className="bg-muted/50 px-3 py-2 rounded-xl rounded-tl-sm">
               <div className="flex gap-1">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="w-1.5 h-1.5 rounded-full bg-emerald-400/60 animate-bounce" style={{ animationDelay: `${i * 150}ms` }} />
+                  <div key={i} className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: `${i * 150}ms` }} />
                 ))}
               </div>
             </div>
@@ -133,21 +174,21 @@ export function ChatPanel({ open, onClose, onEmotionChange }: ChatPanelProps) {
       </div>
 
       {/* Input */}
-      <div className="p-3 border-t border-white/10 bg-white/[0.02]">
+      <div className="p-3 border-t border-border bg-muted/10">
         <div className="flex gap-2">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
             placeholder="Ask me anything..."
-            className="flex-1 bg-white/[0.06] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-white/30 outline-none focus:border-emerald-500/50 transition-colors"
+            className="flex-1 bg-muted/50 border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 transition-colors"
           />
           <button
             onClick={send}
             disabled={!input.trim()}
-            className="p-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 disabled:opacity-30 transition-all"
+            className="p-2 rounded-xl bg-primary/20 hover:bg-primary/30 disabled:opacity-30 transition-all"
           >
-            <Send className="w-4 h-4 text-emerald-400" />
+            <Send className="w-4 h-4 text-primary" />
           </button>
         </div>
       </div>

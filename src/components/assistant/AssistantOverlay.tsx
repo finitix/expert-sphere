@@ -12,6 +12,23 @@ const MICRO_MESSAGES = [
   "Need help choosing a trainer?",
   "I can guide you in 30 seconds.",
   "Let me help you get started.",
+  "Feeling stuck? I've got you! 💪",
+  "Want to see something cool? 😎",
+];
+
+const AUTO_MOODS: EmojiEmotion[] = [
+  "idle", "friendly", "waving", "cool", "excited", "thinking", "love", "laughing", "surprised",
+];
+
+// Roaming positions (percentage-based for responsiveness)
+const ROAM_POSITIONS = [
+  { bottom: 24, right: 24 },
+  { bottom: 24, right: 120 },
+  { bottom: 120, right: 24 },
+  { bottom: 80, right: 80 },
+  { bottom: 24, right: 200 },
+  { bottom: 160, right: 24 },
+  { bottom: 24, right: 24 }, // home
 ];
 
 export function AssistantOverlay() {
@@ -24,6 +41,8 @@ export function AssistantOverlay() {
   const [heroVisible, setHeroVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [bouncing, setBouncing] = useState(false);
+  const [roamPos, setRoamPos] = useState(ROAM_POSITIONS[0]);
+  const [autoMoodIdx, setAutoMoodIdx] = useState(0);
 
   const fullText = "Welcome.\nYou're not just posting a ticket.\nYou're starting a solution.";
 
@@ -67,8 +86,32 @@ export function AssistantOverlay() {
       setTimeout(() => setShowMicro(false), 4000);
     };
     const first = setTimeout(show, 3000);
-    const interval = setInterval(show, 20000 + Math.random() * 15000);
+    const interval = setInterval(show, 18000 + Math.random() * 12000);
     return () => { clearTimeout(first); clearInterval(interval); };
+  }, [phase, chatOpen]);
+
+  // Auto mood cycling when idle in mini mode
+  useEffect(() => {
+    if (phase !== "mini" || chatOpen) return;
+    const interval = setInterval(() => {
+      setAutoMoodIdx(prev => {
+        const next = (prev + 1) % AUTO_MOODS.length;
+        setEmotion(AUTO_MOODS[next]);
+        return next;
+      });
+    }, 8000 + Math.random() * 5000);
+    return () => clearInterval(interval);
+  }, [phase, chatOpen]);
+
+  // Roaming movement in mini mode
+  useEffect(() => {
+    if (phase !== "mini" || chatOpen) return;
+    const roam = () => {
+      const pos = ROAM_POSITIONS[Math.floor(Math.random() * ROAM_POSITIONS.length)];
+      setRoamPos(pos);
+    };
+    const interval = setInterval(roam, 12000 + Math.random() * 8000);
+    return () => clearInterval(interval);
   }, [phase, chatOpen]);
 
   const handleEmotionChange = useCallback((e: string) => {
@@ -81,7 +124,7 @@ export function AssistantOverlay() {
       <div
         className="fixed inset-0 z-[9999] flex items-center justify-center"
         style={{
-          background: "radial-gradient(ellipse at center, rgba(6,78,59,0.25) 0%, rgba(0,0,0,0.97) 100%)",
+          background: "radial-gradient(ellipse at center, hsl(var(--primary) / 0.15) 0%, hsl(var(--background) / 0.97) 100%)",
           transition: "opacity 1.2s ease-out",
           opacity: phase === "morphing" ? 0 : 1,
           pointerEvents: phase === "morphing" ? "none" : "auto",
@@ -98,19 +141,17 @@ export function AssistantOverlay() {
             <EmojiAssistant emotion={emotion} size={220} />
           </div>
 
-          {/* Typewriter text */}
           <div className="mt-6 text-center max-w-lg px-4">
-            <p className="text-lg md:text-xl text-white/90 font-light leading-relaxed whitespace-pre-line min-h-[5rem]">
+            <p className="text-lg md:text-xl text-foreground/90 font-light leading-relaxed whitespace-pre-line min-h-[5rem]">
               {heroText}
-              <span className="inline-block w-0.5 h-5 bg-emerald-400 ml-0.5 animate-pulse" />
+              <span className="inline-block w-0.5 h-5 bg-primary ml-0.5 animate-pulse" />
             </p>
           </div>
 
-          {/* CTA */}
           <div className="mt-6" style={{ opacity: heroText.length >= fullText.length ? 1 : 0, transition: "opacity 0.5s ease" }}>
             <a
               href="/create-ticket"
-              className="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold text-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all hover:scale-105"
+              className="px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-lg shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-105"
             >
               Post a Ticket
             </a>
@@ -120,10 +161,17 @@ export function AssistantOverlay() {
     );
   }
 
-  // Mini assistant
+  // Mini assistant with roaming
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-[10000]">
+      <motion.div
+        className="fixed z-[10000]"
+        animate={{
+          bottom: roamPos.bottom,
+          right: roamPos.right,
+        }}
+        transition={{ type: "spring", stiffness: 60, damping: 20, duration: 2 }}
+      >
         {/* Micro message bubble */}
         <AnimatePresence>
           {showMicro && !chatOpen && (
@@ -132,20 +180,22 @@ export function AssistantOverlay() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 6, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="absolute bottom-full right-0 mb-3 px-4 py-2.5 rounded-2xl bg-emerald-950/90 backdrop-blur-xl border border-emerald-500/20 text-emerald-100 text-sm whitespace-nowrap shadow-2xl shadow-emerald-900/30"
+              className="absolute bottom-full right-0 mb-3 px-4 py-2.5 rounded-2xl bg-card/90 backdrop-blur-xl border border-border text-foreground text-sm whitespace-nowrap shadow-2xl"
             >
               {microMessage}
-              <div className="absolute bottom-0 right-8 translate-y-1/2 rotate-45 w-2.5 h-2.5 bg-emerald-950/90 border-r border-b border-emerald-500/20" />
+              <div className="absolute bottom-0 right-8 translate-y-1/2 rotate-45 w-2.5 h-2.5 bg-card/90 border-r border-b border-border" />
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Emoji button — bigger in mini mode */}
+        {/* Emoji button */}
         <button
           onClick={() => {
             setChatOpen(!chatOpen);
             setShowMicro(false);
             setEmotion(chatOpen ? "idle" : "friendly");
+            // Reset position when opening chat
+            if (!chatOpen) setRoamPos(ROAM_POSITIONS[0]);
           }}
           onMouseEnter={() => {
             setIsHovered(true);
@@ -156,30 +206,19 @@ export function AssistantOverlay() {
             if (!chatOpen) setEmotion("idle");
           }}
           className="relative cursor-pointer"
-          style={{
-            width: 96,
-            height: 96,
-            background: "transparent",
-            border: "none",
-            outline: "none",
-          }}
+          style={{ width: 96, height: 96, background: "transparent", border: "none", outline: "none" }}
         >
           <EmojiAssistant emotion={emotion} size={88} bounce={bouncing} />
-          {/* Glow ring */}
           <div
             className="absolute inset-0 rounded-full transition-opacity duration-500 pointer-events-none"
-            style={{
-              boxShadow: `0 0 20px 4px rgba(52,211,153,${isHovered ? 0.35 : 0.12})`,
-            }}
+            style={{ boxShadow: `0 0 20px 4px hsl(var(--primary) / ${isHovered ? 0.35 : 0.12})` }}
           />
-          {/* Chat badge */}
-          <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg border-2 border-emerald-950">
-            <MessageCircle className="w-3.5 h-3.5 text-white" />
+          <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-lg border-2 border-background">
+            <MessageCircle className="w-3.5 h-3.5 text-primary-foreground" />
           </div>
         </button>
-      </div>
+      </motion.div>
 
-      {/* Chat Panel */}
       <ChatPanel open={chatOpen} onClose={() => { setChatOpen(false); setEmotion("idle"); }} onEmotionChange={handleEmotionChange} />
     </>
   );

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { Robot3DCanvas } from "./Robot3D";
+import { EmojiAssistant } from "./EmojiAssistant";
+import type { EmojiEmotion } from "./EmojiAssistant";
 import { ChatPanel } from "./ChatPanel";
-import type { RobotEmotion } from "./Robot3D";
 import { MessageCircle } from "lucide-react";
 
 const MICRO_MESSAGES = [
@@ -15,7 +15,7 @@ const MICRO_MESSAGES = [
 
 export function AssistantOverlay() {
   const [phase, setPhase] = useState<"hero" | "morphing" | "mini">("hero");
-  const [emotion, setEmotion] = useState<RobotEmotion>("friendly");
+  const [emotion, setEmotion] = useState<EmojiEmotion>("waving");
   const [chatOpen, setChatOpen] = useState(false);
   const [microMessage, setMicroMessage] = useState("");
   const [showMicro, setShowMicro] = useState(false);
@@ -68,7 +68,7 @@ export function AssistantOverlay() {
   }, [phase, chatOpen]);
 
   const handleEmotionChange = useCallback((e: string) => {
-    setEmotion(e as RobotEmotion);
+    setEmotion(e as EmojiEmotion);
   }, []);
 
   // Hero mode — robot rendered directly, no circular container
@@ -84,17 +84,15 @@ export function AssistantOverlay() {
         }}
       >
         <div className="relative flex flex-col items-center">
-          {/* 3D Robot — large, no container wrapping */}
+          {/* Emoji Assistant — large hero */}
           <div
             style={{
-              width: "min(480px, 90vw)",
-              height: "min(560px, 70vh)",
               transition: "transform 1.2s cubic-bezier(0.32, 0.72, 0, 1), opacity 1.2s ease-out",
               transform: phase === "morphing" ? "scale(0.15) translateX(40vw) translateY(40vh)" : "scale(1)",
               opacity: phase === "morphing" ? 0 : 1,
             }}
           >
-            <Robot3DCanvas emotion={emotion} lookAtMouse className="w-full h-full" />
+            <EmojiAssistant emotion={emotion} size={200} />
           </div>
 
           {/* Typewriter text */}
@@ -155,7 +153,7 @@ export function AssistantOverlay() {
             outline: "none",
           }}
         >
-          <Robot3DCanvas emotion={emotion} lookAtMouse={false} className="w-full h-full" scale={1.2} />
+          <EmojiAssistant emotion={emotion} size={64} />
           {/* Subtle glow underneath */}
           <div
             className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full blur-xl transition-opacity duration-500"

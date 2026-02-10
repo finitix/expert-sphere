@@ -50,8 +50,9 @@ const MICRO_MESSAGES = [
   "Want to see something cool? 😎",
 ];
 
-const AUTO_MOODS: EmojiEmotion[] = [
-  "idle", "friendly", "waving", "cool", "excited", "thinking", "love", "laughing", "surprised",
+const ALL_MOODS: EmojiEmotion[] = [
+  "idle", "friendly", "waving", "cool", "excited", "thinking", "love",
+  "laughing", "surprised", "confused", "sad", "sleeping", "fear", "angry", "cry",
 ];
 
 // Roaming positions (percentage-based for responsiveness)
@@ -126,16 +127,14 @@ export function AssistantOverlay() {
     return () => { clearTimeout(first); clearInterval(interval); };
   }, [phase, chatOpen]);
 
-  // Auto mood cycling when idle in mini mode
+  // Random mood changes in mini mode (not sequential)
   useEffect(() => {
     if (phase !== "mini" || chatOpen) return;
-    const interval = setInterval(() => {
-      setAutoMoodIdx(prev => {
-        const next = (prev + 1) % AUTO_MOODS.length;
-        setEmotion(AUTO_MOODS[next]);
-        return next;
-      });
-    }, 8000 + Math.random() * 5000);
+    const changeMood = () => {
+      const randomMood = ALL_MOODS[Math.floor(Math.random() * ALL_MOODS.length)];
+      setEmotion(randomMood);
+    };
+    const interval = setInterval(changeMood, 5000 + Math.random() * 6000);
     return () => clearInterval(interval);
   }, [phase, chatOpen]);
 

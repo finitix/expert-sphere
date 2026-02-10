@@ -21,6 +21,7 @@ export function AssistantOverlay() {
   const [showMicro, setShowMicro] = useState(false);
   const [heroText, setHeroText] = useState("");
   const [heroVisible, setHeroVisible] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
   const fullText = "Welcome.\nYou're not just posting a ticket.\nYou're starting a solution.";
 
@@ -61,7 +62,6 @@ export function AssistantOverlay() {
       setShowMicro(true);
       setTimeout(() => setShowMicro(false), 4000);
     };
-    // First message after 3s
     const first = setTimeout(show, 3000);
     const interval = setInterval(show, 20000 + Math.random() * 15000);
     return () => { clearTimeout(first); clearInterval(interval); };
@@ -71,7 +71,7 @@ export function AssistantOverlay() {
     setEmotion(e as RobotEmotion);
   }, []);
 
-  // Hero mode
+  // Hero mode — robot rendered directly, no circular container
   if (phase === "hero" || (phase === "morphing" && heroVisible)) {
     return (
       <div
@@ -84,12 +84,13 @@ export function AssistantOverlay() {
         }}
       >
         <div className="relative flex flex-col items-center">
-          {/* 3D Robot - hero size */}
+          {/* 3D Robot — large, no container wrapping */}
           <div
-            className="w-[340px] h-[400px] md:w-[420px] md:h-[480px]"
             style={{
+              width: "min(480px, 90vw)",
+              height: "min(560px, 70vh)",
               transition: "transform 1.2s cubic-bezier(0.32, 0.72, 0, 1), opacity 1.2s ease-out",
-              transform: phase === "morphing" ? "scale(0.2) translateX(40vw) translateY(40vh)" : "scale(1)",
+              transform: phase === "morphing" ? "scale(0.15) translateX(40vw) translateY(40vh)" : "scale(1)",
               opacity: phase === "morphing" ? 0 : 1,
             }}
           >
@@ -97,7 +98,7 @@ export function AssistantOverlay() {
           </div>
 
           {/* Typewriter text */}
-          <div className="mt-6 text-center max-w-lg px-4">
+          <div className="mt-4 text-center max-w-lg px-4">
             <p className="text-lg md:text-xl text-white/90 font-light leading-relaxed whitespace-pre-line min-h-[5rem]">
               {heroText}
               <span className="inline-block w-0.5 h-5 bg-emerald-400 ml-0.5 animate-pulse" />
@@ -105,7 +106,7 @@ export function AssistantOverlay() {
           </div>
 
           {/* CTA */}
-          <div className="mt-8" style={{ opacity: heroText.length >= fullText.length ? 1 : 0, transition: "opacity 0.5s ease" }}>
+          <div className="mt-6" style={{ opacity: heroText.length >= fullText.length ? 1 : 0, transition: "opacity 0.5s ease" }}>
             <a
               href="/create-ticket"
               className="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold text-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all hover:scale-105"
@@ -118,10 +119,9 @@ export function AssistantOverlay() {
     );
   }
 
-  // Mini assistant mode
+  // Mini assistant — robot rendered directly, no circle wrapper
   return (
     <>
-      {/* Mini robot button */}
       <div className="fixed bottom-6 right-6 z-[10000]">
         {/* Micro message bubble */}
         {showMicro && !chatOpen && (
@@ -131,20 +131,43 @@ export function AssistantOverlay() {
           </div>
         )}
 
+        {/* Robot button — no circle, just the robot directly */}
         <button
           onClick={() => {
             setChatOpen(!chatOpen);
             setShowMicro(false);
             setEmotion(chatOpen ? "idle" : "friendly");
           }}
-          className="group relative w-16 h-16 rounded-full overflow-hidden shadow-2xl shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all hover:scale-110"
-          style={{ background: "radial-gradient(circle at 30% 30%, #16213e, #0d1117)" }}
+          onMouseEnter={() => {
+            setIsHovered(true);
+            if (!chatOpen) setEmotion("friendly");
+          }}
+          onMouseLeave={() => {
+            setIsHovered(false);
+            if (!chatOpen) setEmotion("idle");
+          }}
+          className="relative cursor-pointer transition-transform duration-300 hover:scale-110"
+          style={{
+            width: 80,
+            height: 80,
+            background: "transparent",
+            border: "none",
+            outline: "none",
+          }}
         >
-          <Robot3DCanvas emotion={emotion} lookAtMouse={false} className="w-full h-full" />
-          {/* Pulse ring */}
-          <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30 animate-ping" style={{ animationDuration: "3s" }} />
-          {/* Chat icon overlay */}
-          <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg">
+          <Robot3DCanvas emotion={emotion} lookAtMouse={false} className="w-full h-full" scale={1.2} />
+          {/* Subtle glow underneath */}
+          <div
+            className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full blur-xl transition-opacity duration-500"
+            style={{
+              width: 50,
+              height: 12,
+              background: "radial-gradient(ellipse, rgba(63,185,80,0.4) 0%, transparent 70%)",
+              opacity: isHovered ? 1 : 0.5,
+            }}
+          />
+          {/* Chat icon */}
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg">
             <MessageCircle className="w-3 h-3 text-white" />
           </div>
         </button>

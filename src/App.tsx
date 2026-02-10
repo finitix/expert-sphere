@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AnimatePresence } from "framer-motion";
+import { AssistantOverlay } from "@/components/assistant/AssistantOverlay";
 
 // Eager load for instant first paint
 import Index from "./pages/Index";
@@ -61,6 +62,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <AssistantOverlay />
           <Suspense fallback={<PageLoader />}>
             <AnimatePresence mode="wait">
               <Routes>

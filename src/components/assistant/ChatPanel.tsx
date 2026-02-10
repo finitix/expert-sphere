@@ -7,22 +7,46 @@ interface Message {
   content: string;
 }
 
-const PRETRAINED: Record<string, string> = {
-  help: "I can help you post a ticket, find a trainer, or navigate the site. What do you need?",
-  ticket: "To create a ticket:\n1. Click **Post a Ticket**\n2. Describe your problem\n3. Set a budget\n4. Get matched with experts!\n\nWant me to take you there?",
-  trainer: "We have 500+ verified expert trainers across React, Python, DevOps, and more. Visit the **Trainers** page to browse them!",
-  pricing: "You only pay when your problem is solved. Set your own budget, and trainers bid on your ticket.",
-  how: "Post a problem → Get matched with experts → They solve it → Pay only when solved. Simple!",
-  hello: "Hello! 👋 I'm your AI assistant. I can help with tickets, finding trainers, or answering questions about the platform.",
-  hi: "Hi there! 👋 How can I help you today?",
+const PRETRAINED: Record<string, { text: string; emotion: string }> = {
+  help: { text: "I can help you post a ticket, find a trainer, or navigate the site. What do you need?", emotion: "friendly" },
+  ticket: { text: "To create a ticket:\n1. Click **Post a Ticket**\n2. Describe your problem\n3. Set a budget\n4. Get matched with experts!\n\nWant me to take you there?", emotion: "excited" },
+  trainer: { text: "We have 500+ verified expert trainers across React, Python, DevOps, and more. Visit the **Trainers** page to browse them!", emotion: "excited" },
+  pricing: { text: "You only pay when your problem is solved. Set your own budget, and trainers bid on your ticket.", emotion: "friendly" },
+  how: { text: "Post a problem → Get matched with experts → They solve it → Pay only when solved. Simple!", emotion: "friendly" },
+  hello: { text: "Hello! 👋 I'm your AI assistant. I can help with tickets, finding trainers, or answering questions about the platform.", emotion: "waving" },
+  hi: { text: "Hi there! 👋 How can I help you today?", emotion: "waving" },
+  thanks: { text: "You're welcome! 😊 Happy to help anytime!", emotion: "love" },
+  thank: { text: "Glad I could help! Let me know if there's anything else. 💚", emotion: "love" },
+  love: { text: "Aww, thanks! 💕 I'm here for you!", emotion: "love" },
+  amazing: { text: "Thank you so much! That means a lot! ✨", emotion: "love" },
+  great: { text: "Glad to hear that! 🎉 What else can I do?", emotion: "excited" },
+  awesome: { text: "You're awesome too! 🚀", emotion: "excited" },
+  wow: { text: "I know, right?! Pretty cool stuff! ✨", emotion: "surprised" },
+  what: { text: "That's a great question! Let me think... 🤔", emotion: "thinking" },
+  why: { text: "Good question! Here's the deal... 🤔", emotion: "thinking" },
+  confused: { text: "No worries! Let me explain it differently. Which part is unclear?", emotion: "confused" },
+  understand: { text: "I'll try to make it clearer! Ask me specific questions and I'll break it down. 😊", emotion: "confused" },
+  wrong: { text: "Oh no! 😟 Let me try to fix that. What went wrong?", emotion: "surprised" },
+  error: { text: "Hmm, that doesn't sound right. Can you tell me more about the issue?", emotion: "confused" },
+  bug: { text: "Let me look into that! 🔍 Can you describe what happened?", emotion: "thinking" },
+  slow: { text: "I apologize for the wait! Let me see what I can do to speed things up.", emotion: "thinking" },
+  boring: { text: "Oh! Let me make things more interesting! What would you like to explore? 🎭", emotion: "surprised" },
+  funny: { text: "Haha! Glad you find me entertaining! 😂", emotion: "laughing" },
+  haha: { text: "😂 I try my best! What else can I help with?", emotion: "laughing" },
+  lol: { text: "Hehe! 😄 Glad to make you smile!", emotion: "laughing" },
+  joke: { text: "Why do programmers prefer dark mode? Because light attracts bugs! 🐛😂", emotion: "laughing" },
+  bye: { text: "Goodbye! 😴 I'll be right here if you need me. Sweet dreams!", emotion: "sleeping" },
+  sleep: { text: "Zzz... Just kidding! I'm always awake for you. 😄", emotion: "sleeping" },
+  night: { text: "Good night! 🌙 Rest well, I'll be here when you're back!", emotion: "sleeping" },
+  cool: { text: "😎 Totally cool! What's next?", emotion: "cool" },
 };
 
-function getResponse(input: string): string {
+function getResponse(input: string): { text: string; emotion: string } {
   const lower = input.toLowerCase();
   for (const [key, val] of Object.entries(PRETRAINED)) {
     if (lower.includes(key)) return val;
   }
-  return "I'm here to help! You can ask me about:\n• **Creating tickets**\n• **Finding trainers**\n• **How the platform works**\n• **Pricing**\n\nWhat would you like to know?";
+  return { text: "I'm here to help! You can ask me about:\n• **Creating tickets**\n• **Finding trainers**\n• **How the platform works**\n• **Pricing**\n\nWhat would you like to know?", emotion: "friendly" };
 }
 
 interface ChatPanelProps {
@@ -52,11 +76,11 @@ export function ChatPanel({ open, onClose, onEmotionChange }: ChatPanelProps) {
     setIsTyping(true);
 
     setTimeout(() => {
-      const response = getResponse(userMsg.content);
-      setMessages((prev) => [...prev, { role: "assistant", content: response }]);
+      const { text, emotion } = getResponse(userMsg.content);
+      setMessages((prev) => [...prev, { role: "assistant", content: text }]);
       setIsTyping(false);
-      onEmotionChange?.("friendly");
-      setTimeout(() => onEmotionChange?.("idle"), 3000);
+      onEmotionChange?.(emotion);
+      setTimeout(() => onEmotionChange?.("idle"), 4000);
     }, 800 + Math.random() * 600);
   };
 

@@ -1,9 +1,43 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { EmojiAssistant } from "./EmojiAssistant";
 import type { EmojiEmotion } from "./EmojiAssistant";
 import { ChatPanel } from "./ChatPanel";
 import { MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// Particle trail component
+function ParticleTrail({ active, color }: { active: boolean; color: string }) {
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const counter = useRef(0);
+
+  useEffect(() => {
+    if (!active) { setParticles([]); return; }
+    const interval = setInterval(() => {
+      counter.current++;
+      setParticles(prev => {
+        const next = [...prev, { id: counter.current, x: Math.random() * 40 - 20, y: Math.random() * 20 }];
+        return next.slice(-6);
+      });
+    }, 400);
+    return () => clearInterval(interval);
+  }, [active]);
+
+  return (
+    <AnimatePresence>
+      {particles.map(p => (
+        <motion.div
+          key={p.id}
+          initial={{ opacity: 0.8, scale: 1, x: 48 + p.x, y: 48 + p.y }}
+          animate={{ opacity: 0, scale: 0.3, y: 48 + p.y + 30 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="absolute pointer-events-none rounded-full"
+          style={{ width: 6, height: 6, background: color, filter: "blur(1px)" }}
+        />
+      ))}
+    </AnimatePresence>
+  );
+}
 
 const MICRO_MESSAGES = [
   "Need help? 👋",
@@ -43,6 +77,8 @@ export function AssistantOverlay() {
   const [bouncing, setBouncing] = useState(false);
   const [roamPos, setRoamPos] = useState(ROAM_POSITIONS[0]);
   const [autoMoodIdx, setAutoMoodIdx] = useState(0);
+  const [isRoaming, setIsRoaming] = useState(false);
+  const prevRoamPos = useRef(ROAM_POSITIONS[0]);
 
   const fullText = "Welcome.\nYou're not just posting a ticket.\nYou're starting a solution.";
 
@@ -108,11 +144,14 @@ export function AssistantOverlay() {
     if (phase !== "mini" || chatOpen) return;
     const roam = () => {
       const pos = ROAM_POSITIONS[Math.floor(Math.random() * ROAM_POSITIONS.length)];
+      prevRoamPos.current = roamPos;
+      setIsRoaming(true);
       setRoamPos(pos);
+      setTimeout(() => setIsRoaming(false), 2500);
     };
     const interval = setInterval(roam, 12000 + Math.random() * 8000);
     return () => clearInterval(interval);
-  }, [phase, chatOpen]);
+  }, [phase, chatOpen, roamPos]);
 
   const handleEmotionChange = useCallback((e: string) => {
     setEmotion(e as EmojiEmotion);
@@ -170,8 +209,10 @@ export function AssistantOverlay() {
           bottom: roamPos.bottom,
           right: roamPos.right,
         }}
-        transition={{ type: "spring", stiffness: 60, damping: 20, duration: 2 }}
+        transition={{ type: "spring", stiffness: 50, damping: 18, mass: 1.2 }}
       >
+        {/* Particle trail when roaming */}
+        <ParticleTrail active={isRoaming} color="hsl(var(--primary))" />
         {/* Micro message bubble */}
         <AnimatePresence>
           {showMicro && !chatOpen && (

@@ -189,21 +189,21 @@ export function EmojiAssistant({ emotion = "idle", size = 80, onClick, onHover, 
 
   // Body animation - head tilt and body sway
   const bodyAnims: Record<string, object> = {
-    excited: { y: [0, -8, 0], rotate: [0, -3, 3, 0], transition: { repeat: Infinity, duration: 0.5 } },
-    waving: { rotate: [0, -5, 5, -3, 0], transition: { repeat: Infinity, duration: 1.1 } },
-    thinking: { rotate: [0, 5, 0, -5, 0], x: [0, 3, 0, -3, 0], transition: { repeat: Infinity, duration: 3 } },
-    sleeping: { y: [0, 3, 0], rotate: [0, 2, 0, -2, 0], transition: { repeat: Infinity, duration: 4, ease: "easeInOut" } },
-    surprised: { y: [0, -6, 0], scale: [1, 1.08, 1], transition: { repeat: 2, duration: 0.3 } },
-    confused: { rotate: [0, -8, 8, -4, 0], x: [0, -2, 2, 0], transition: { repeat: Infinity, duration: 2.5 } },
-    sad: { y: [0, 2, 0], rotate: [0, -2, 0], transition: { repeat: Infinity, duration: 3, ease: "easeInOut" } },
-    cry: { y: [0, 1, 0], rotate: [0, -1, 1, 0], transition: { repeat: Infinity, duration: 1.5 } },
-    fear: { x: [0, -3, 3, -2, 2, 0], transition: { repeat: Infinity, duration: 0.6 } },
-    angry: { rotate: [0, -2, 2, -2, 0], y: [0, -1, 0], transition: { repeat: Infinity, duration: 0.5 } },
-    love: { y: [0, -4, 0], scale: [1, 1.05, 1], transition: { repeat: Infinity, duration: 1.5, ease: "easeInOut" } },
-    cool: { rotate: [0, 2, -2, 0], transition: { repeat: Infinity, duration: 4 } },
-    laughing: { y: [0, -5, 0, -3, 0], rotate: [0, -3, 3, 0], transition: { repeat: Infinity, duration: 0.6 } },
-    friendly: { y: [0, -2, 0], rotate: [0, 1, -1, 0], transition: { repeat: Infinity, duration: 2 } },
-    idle: { y: [0, -2, 0], transition: { repeat: Infinity, duration: 2.5, ease: "easeInOut" } },
+    excited: { y: [0, -10, 2, -6, 0], rotate: [0, -5, 5, -3, 0], scale: [1, 1.06, 0.97, 1.03, 1], transition: { repeat: Infinity, duration: 0.55, ease: "easeInOut" } },
+    waving: { rotate: [0, -7, 7, -4, 2, 0], y: [0, -3, 0], transition: { repeat: Infinity, duration: 1.2 } },
+    thinking: { rotate: [0, 6, 0, -6, 0], x: [0, 5, 0, -5, 0], y: [0, -1, 0], transition: { repeat: Infinity, duration: 3.5, ease: "easeInOut" } },
+    sleeping: { y: [0, 4, 0], rotate: [0, 3, 0, -3, 0], scale: [1, 0.98, 1], transition: { repeat: Infinity, duration: 4.5, ease: "easeInOut" } },
+    surprised: { y: [0, -10, 0, -4, 0], scale: [1, 1.15, 0.95, 1.05, 1], transition: { repeat: Infinity, duration: 0.8 } },
+    confused: { rotate: [0, -10, 10, -6, 4, 0], x: [0, -4, 4, -2, 0], y: [0, 1, -1, 0], transition: { repeat: Infinity, duration: 2.8 } },
+    sad: { y: [0, 3, 1, 2, 0], rotate: [0, -3, 0, -1, 0], scale: [1, 0.97, 1], transition: { repeat: Infinity, duration: 3.5, ease: "easeInOut" } },
+    cry: { y: [0, 2, 0, 1, 0], rotate: [0, -2, 2, -1, 0], scale: [1, 0.96, 1, 0.98, 1], transition: { repeat: Infinity, duration: 1.8 } },
+    fear: { x: [0, -5, 5, -3, 3, -1, 0], y: [0, -2, 0], scale: [1, 0.95, 1.02, 0.97, 1], transition: { repeat: Infinity, duration: 0.5 } },
+    angry: { rotate: [0, -3, 3, -3, 3, 0], y: [0, -2, 0, -1, 0], scale: [1, 1.04, 0.98, 1.02, 1], transition: { repeat: Infinity, duration: 0.45 } },
+    love: { y: [0, -6, 0, -3, 0], scale: [1, 1.08, 0.98, 1.04, 1], rotate: [0, 2, -2, 0], transition: { repeat: Infinity, duration: 1.8, ease: "easeInOut" } },
+    cool: { rotate: [0, 3, -3, 1, 0], y: [0, -1, 0], transition: { repeat: Infinity, duration: 4.5, ease: "easeInOut" } },
+    laughing: { y: [0, -7, 2, -5, 0, -3, 0], rotate: [0, -4, 4, -2, 0], scale: [1, 1.05, 0.97, 1.03, 1], transition: { repeat: Infinity, duration: 0.55 } },
+    friendly: { y: [0, -3, 0, -1, 0], rotate: [0, 2, -2, 1, 0], transition: { repeat: Infinity, duration: 2.2, ease: "easeInOut" } },
+    idle: { y: [0, -3, 0], rotate: [0, 0.5, -0.5, 0], transition: { repeat: Infinity, duration: 3, ease: "easeInOut" } },
   };
 
   const bodyAnim = bodyAnims[emotion] || bodyAnims.idle;
@@ -394,11 +394,22 @@ export function EmojiAssistant({ emotion = "idle", size = 80, onClick, onHover, 
         {sleepingZzz}
         {angrySteam}
 
+        {/* Ambient sparkles */}
+        <motion.circle cx="12" cy="12" r="1.5" fill={colors.glow} opacity="0"
+          animate={{ opacity: [0, 0.8, 0], scale: [0.5, 1.2, 0.5] }} transition={{ repeat: Infinity, duration: 2.5, delay: 0 }} />
+        <motion.circle cx="68" cy="15" r="1" fill={colors.glow} opacity="0"
+          animate={{ opacity: [0, 0.6, 0], scale: [0.5, 1.3, 0.5] }} transition={{ repeat: Infinity, duration: 3, delay: 0.8 }} />
+        <motion.circle cx="8" cy="55" r="1.2" fill={colors.face1} opacity="0"
+          animate={{ opacity: [0, 0.5, 0], scale: [0.5, 1.1, 0.5] }} transition={{ repeat: Infinity, duration: 2.8, delay: 1.4 }} />
+        <motion.circle cx="72" cy="60" r="1" fill={colors.face1} opacity="0"
+          animate={{ opacity: [0, 0.7, 0], scale: [0.6, 1.2, 0.6] }} transition={{ repeat: Infinity, duration: 2.2, delay: 0.5 }} />
+
         {/* Antenna */}
-        <circle cx="40" cy="5" r="2" fill={colors.glow} opacity="0.6">
-          <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2s" repeatCount="indefinite" />
+        <circle cx="40" cy="5" r="2.5" fill={colors.glow} opacity="0.6">
+          <animate attributeName="opacity" values="0.3;1;0.3" dur="1.8s" repeatCount="indefinite" />
+          <animate attributeName="r" values="2;3;2" dur="1.8s" repeatCount="indefinite" />
         </circle>
-        <line x1="40" y1="7" x2="40" y2="4" stroke={colors.glow} strokeWidth="1" opacity="0.4" />
+        <line x1="40" y1="7" x2="40" y2="4" stroke={colors.glow} strokeWidth="1.2" opacity="0.5" />
       </svg>
     </motion.div>
   );

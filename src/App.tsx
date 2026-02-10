@@ -20,6 +20,8 @@ const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
 const CreateTicket = lazy(() => import("./pages/CreateTicket"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Dashboard pages - lazy loaded
@@ -72,6 +74,8 @@ const App = () => (
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/create-ticket" element={<CreateTicket />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
                 {/* User Dashboard */}
                 <Route path="/dashboard" element={<UserDashboard />} />
                 <Route path="/dashboard/tickets" element={<TicketsPage />} />

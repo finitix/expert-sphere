@@ -3,6 +3,7 @@ import { EmojiAssistant } from "./EmojiAssistant";
 import type { EmojiEmotion } from "./EmojiAssistant";
 import { ChatPanel } from "./ChatPanel";
 import { MessageCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MICRO_MESSAGES = [
   "Need help? 👋",
@@ -22,6 +23,7 @@ export function AssistantOverlay() {
   const [heroText, setHeroText] = useState("");
   const [heroVisible, setHeroVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [bouncing, setBouncing] = useState(false);
 
   const fullText = "Welcome.\nYou're not just posting a ticket.\nYou're starting a solution.";
 
@@ -53,13 +55,15 @@ export function AssistantOverlay() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Micro messages in mini mode
+  // Micro messages in mini mode (with bounce)
   useEffect(() => {
     if (phase !== "mini" || chatOpen) return;
     const show = () => {
       const msg = MICRO_MESSAGES[Math.floor(Math.random() * MICRO_MESSAGES.length)];
       setMicroMessage(msg);
       setShowMicro(true);
+      setBouncing(true);
+      setTimeout(() => setBouncing(false), 600);
       setTimeout(() => setShowMicro(false), 4000);
     };
     const first = setTimeout(show, 3000);
@@ -71,20 +75,19 @@ export function AssistantOverlay() {
     setEmotion(e as EmojiEmotion);
   }, []);
 
-  // Hero mode — robot rendered directly, no circular container
+  // Hero mode
   if (phase === "hero" || (phase === "morphing" && heroVisible)) {
     return (
       <div
         className="fixed inset-0 z-[9999] flex items-center justify-center"
         style={{
-          background: "radial-gradient(ellipse at center, rgba(13,17,23,0.95) 0%, rgba(0,0,0,0.98) 100%)",
+          background: "radial-gradient(ellipse at center, rgba(6,78,59,0.25) 0%, rgba(0,0,0,0.97) 100%)",
           transition: "opacity 1.2s ease-out",
           opacity: phase === "morphing" ? 0 : 1,
           pointerEvents: phase === "morphing" ? "none" : "auto",
         }}
       >
         <div className="relative flex flex-col items-center">
-          {/* Emoji Assistant — large hero */}
           <div
             style={{
               transition: "transform 1.2s cubic-bezier(0.32, 0.72, 0, 1), opacity 1.2s ease-out",
@@ -92,11 +95,11 @@ export function AssistantOverlay() {
               opacity: phase === "morphing" ? 0 : 1,
             }}
           >
-            <EmojiAssistant emotion={emotion} size={200} />
+            <EmojiAssistant emotion={emotion} size={220} />
           </div>
 
           {/* Typewriter text */}
-          <div className="mt-4 text-center max-w-lg px-4">
+          <div className="mt-6 text-center max-w-lg px-4">
             <p className="text-lg md:text-xl text-white/90 font-light leading-relaxed whitespace-pre-line min-h-[5rem]">
               {heroText}
               <span className="inline-block w-0.5 h-5 bg-emerald-400 ml-0.5 animate-pulse" />
@@ -117,19 +120,27 @@ export function AssistantOverlay() {
     );
   }
 
-  // Mini assistant — robot rendered directly, no circle wrapper
+  // Mini assistant
   return (
     <>
       <div className="fixed bottom-6 right-6 z-[10000]">
         {/* Micro message bubble */}
-        {showMicro && !chatOpen && (
-          <div className="absolute bottom-full right-0 mb-2 px-4 py-2 rounded-xl bg-[#0d1117]/90 backdrop-blur-xl border border-white/10 text-white text-sm whitespace-nowrap shadow-xl animate-fade-in">
-            {microMessage}
-            <div className="absolute bottom-0 right-6 translate-y-1/2 rotate-45 w-2 h-2 bg-[#0d1117]/90 border-r border-b border-white/10" />
-          </div>
-        )}
+        <AnimatePresence>
+          {showMicro && !chatOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 6, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="absolute bottom-full right-0 mb-3 px-4 py-2.5 rounded-2xl bg-emerald-950/90 backdrop-blur-xl border border-emerald-500/20 text-emerald-100 text-sm whitespace-nowrap shadow-2xl shadow-emerald-900/30"
+            >
+              {microMessage}
+              <div className="absolute bottom-0 right-8 translate-y-1/2 rotate-45 w-2.5 h-2.5 bg-emerald-950/90 border-r border-b border-emerald-500/20" />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Robot button — no circle, just the robot directly */}
+        {/* Emoji button — bigger in mini mode */}
         <button
           onClick={() => {
             setChatOpen(!chatOpen);
@@ -144,29 +155,26 @@ export function AssistantOverlay() {
             setIsHovered(false);
             if (!chatOpen) setEmotion("idle");
           }}
-          className="relative cursor-pointer transition-transform duration-300 hover:scale-110"
+          className="relative cursor-pointer"
           style={{
-            width: 80,
-            height: 80,
+            width: 96,
+            height: 96,
             background: "transparent",
             border: "none",
             outline: "none",
           }}
         >
-          <EmojiAssistant emotion={emotion} size={64} />
-          {/* Subtle glow underneath */}
+          <EmojiAssistant emotion={emotion} size={88} bounce={bouncing} />
+          {/* Glow ring */}
           <div
-            className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full blur-xl transition-opacity duration-500"
+            className="absolute inset-0 rounded-full transition-opacity duration-500 pointer-events-none"
             style={{
-              width: 50,
-              height: 12,
-              background: "radial-gradient(ellipse, rgba(63,185,80,0.4) 0%, transparent 70%)",
-              opacity: isHovered ? 1 : 0.5,
+              boxShadow: `0 0 20px 4px rgba(52,211,153,${isHovered ? 0.35 : 0.12})`,
             }}
           />
-          {/* Chat icon */}
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg">
-            <MessageCircle className="w-3 h-3 text-white" />
+          {/* Chat badge */}
+          <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg border-2 border-emerald-950">
+            <MessageCircle className="w-3.5 h-3.5 text-white" />
           </div>
         </button>
       </div>

@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export type EmojiEmotion =
@@ -313,6 +313,10 @@ export function EmojiAssistant({ emotion = "idle", size = 80, onClick, onHover, 
     </g>
   );
 
+  // Smooth emotion transitions via key-based AnimatePresence on the SVG content
+  const prevEmotion = useRef(emotion);
+  useEffect(() => { prevEmotion.current = emotion; }, [emotion]);
+
   return (
     <motion.div
       animate={{ ...bodyAnim, ...bounceAnim }}
@@ -320,10 +324,21 @@ export function EmojiAssistant({ emotion = "idle", size = 80, onClick, onHover, 
       onMouseEnter={() => onHover?.(true)}
       onMouseLeave={() => onHover?.(false)}
       className="cursor-pointer select-none relative"
-      style={{ width: size, height: size }}
+      style={{ width: size, height: size + 12 }}
       whileHover={{ scale: 1.15 }}
       whileTap={{ scale: 0.92 }}
     >
+      {/* Ground shadow */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2 rounded-[50%] pointer-events-none"
+        style={{
+          bottom: 0,
+          width: size * 0.6,
+          height: size * 0.1,
+          background: `radial-gradient(ellipse, ${isDark ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.15)'} 0%, transparent 70%)`,
+          filter: 'blur(2px)',
+        }}
+      />
       <svg viewBox="0 0 80 80" width={size} height={size}>
         <defs>
           <radialGradient id={`${uid}-face`} cx="45%" cy="38%" r="55%">

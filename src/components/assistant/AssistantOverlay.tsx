@@ -249,10 +249,6 @@ export function AssistantOverlay() {
           style={{ width: 96, height: 96, background: "transparent", border: "none", outline: "none" }}
         >
           <LottieAssistant emotion={emotion} size={88} bounce={bouncing} />
-          <div
-            className="absolute inset-0 rounded-full transition-opacity duration-500 pointer-events-none"
-            style={{ boxShadow: `0 0 20px 4px hsl(var(--primary) / ${isHovered ? 0.35 : 0.12})` }}
-          />
           <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-lg border-2 border-background">
             <MessageCircle className="w-3.5 h-3.5 text-primary-foreground" />
           </div>

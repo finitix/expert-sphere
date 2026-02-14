@@ -1,6 +1,6 @@
 import { useRef, useEffect, useMemo, useState } from "react";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { EmojiEmotion } from "./EmojiAssistant";
 
@@ -12,31 +12,23 @@ interface LottieAssistantProps {
   bounce?: boolean;
 }
 
-// Map emotions to their dedicated animation files
-const EMOTION_ANIM_MAP: Record<string, string> = {
-  idle:      "/animations/robot-idle.json",
-  friendly:  "/animations/robot-waving.json",
-  waving:    "/animations/robot-waving.json",
-  excited:   "/animations/robot-excited.json",
-  thinking:  "/animations/robot-thinking.json",
-  sleeping:  "/animations/robot-sleeping.json",
-  surprised: "/animations/robot-excited.json",
-  confused:  "/animations/robot-confused.json",
-  sad:       "/animations/robot-sad.json",
-  cry:       "/animations/robot-sad.json",
-  fear:      "/animations/robot-confused.json",
-  angry:     "/animations/robot-sad.json",
-  love:      "/animations/robot-love.json",
-  cool:      "/animations/robot-cool.json",
-  laughing:  "/animations/robot-excited.json",
-};
-
-// Playback speed per emotion for variety
-const SPEED_MAP: Record<string, number> = {
-  idle: 0.6, friendly: 1, waving: 1.2, excited: 1.5,
-  thinking: 0.5, sleeping: 0.3, surprised: 2, confused: 0.7,
-  sad: 0.5, cry: 0.6, fear: 2.5, angry: 1.8,
-  love: 0.8, cool: 0.7, laughing: 1.4,
+// Map emotions to playback speed & segment ranges within the 194-frame animation
+const EMOTION_CONFIG: Record<string, { speed: number; loop: boolean; segment?: [number, number] }> = {
+  idle:      { speed: 0.5, loop: true },
+  friendly:  { speed: 1, loop: true },
+  waving:    { speed: 1.2, loop: true },
+  excited:   { speed: 2, loop: true },
+  thinking:  { speed: 0.3, loop: true, segment: [0, 60] },
+  sleeping:  { speed: 0.15, loop: true, segment: [40, 80] },
+  surprised: { speed: 2.5, loop: true, segment: [0, 40] },
+  confused:  { speed: 0.6, loop: true, segment: [60, 120] },
+  sad:       { speed: 0.4, loop: true, segment: [80, 140] },
+  cry:       { speed: 0.5, loop: true, segment: [80, 140] },
+  fear:      { speed: 3, loop: true, segment: [0, 50] },
+  angry:     { speed: 1.8, loop: true, segment: [20, 80] },
+  love:      { speed: 0.8, loop: true },
+  cool:      { speed: 0.7, loop: true },
+  laughing:  { speed: 1.5, loop: true },
 };
 
 // Body sway animations per emotion
@@ -58,44 +50,31 @@ const bodyAnims: Record<string, object> = {
   idle:      { y: [0, -2, 0], transition: { repeat: Infinity, duration: 3, ease: "easeInOut" } },
 };
 
-// Cache loaded animation data
-const animCache: Record<string, unknown> = {};
-
 export function LottieAssistant({ emotion = "idle", size = 80, onClick, onHover, bounce = false }: LottieAssistantProps) {
   const lottieRef = useRef<LottieRefCurrentProps>(null);
   const [animData, setAnimData] = useState<unknown>(null);
-  const [currentFile, setCurrentFile] = useState("");
 
-  const animFile = EMOTION_ANIM_MAP[emotion] || EMOTION_ANIM_MAP.idle;
-  const speed = SPEED_MAP[emotion] || 1;
+  // Load animation data
+  useEffect(() => {
+    fetch("/animations/robot-waving.json")
+      .then(r => r.json())
+      .then(setAnimData)
+      .catch(console.error);
+  }, []);
+
+  const config = useMemo(() => EMOTION_CONFIG[emotion] || EMOTION_CONFIG.idle, [emotion]);
   const bodyAnim = bodyAnims[emotion] || bodyAnims.idle;
   const bounceAnim = bounce ? { scale: [1, 1.15, 0.95, 1.05, 1], transition: { duration: 0.5 } } : {};
 
-  // Load animation data when emotion file changes
-  useEffect(() => {
-    if (animFile === currentFile && animData) return;
-
-    if (animCache[animFile]) {
-      setAnimData(animCache[animFile]);
-      setCurrentFile(animFile);
-      return;
-    }
-
-    fetch(animFile)
-      .then(r => r.json())
-      .then(data => {
-        animCache[animFile] = data;
-        setAnimData(data);
-        setCurrentFile(animFile);
-      })
-      .catch(console.error);
-  }, [animFile]);
-
-  // Update speed when emotion changes
   useEffect(() => {
     if (!lottieRef.current) return;
-    lottieRef.current.setSpeed(speed);
-  }, [emotion, speed]);
+    lottieRef.current.setSpeed(config.speed);
+    if (config.segment) {
+      lottieRef.current.playSegments(config.segment, true);
+    } else {
+      lottieRef.current.goToAndPlay(0);
+    }
+  }, [emotion, config]);
 
   return (
     <motion.div
@@ -119,25 +98,15 @@ export function LottieAssistant({ emotion = "idle", size = 80, onClick, onHover,
           filter: "blur(3px)",
         }}
       />
-      <AnimatePresence mode="wait">
-        {animData && (
-          <motion.div
-            key={currentFile}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Lottie
-              lottieRef={lottieRef}
-              animationData={animData}
-              loop
-              autoplay
-              style={{ width: size, height: size }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {animData && (
+        <Lottie
+          lottieRef={lottieRef}
+          animationData={animData}
+          loop={config.loop}
+          autoplay
+          style={{ width: size, height: size }}
+        />
+      )}
     </motion.div>
   );
 }

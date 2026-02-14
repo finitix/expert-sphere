@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { EmojiAssistant } from "./EmojiAssistant";
+import { LottieAssistant } from "./LottieAssistant";
 import type { EmojiEmotion } from "./EmojiAssistant";
 import { ChatPanel } from "./ChatPanel";
 import { MessageCircle } from "lucide-react";
@@ -176,7 +176,7 @@ export function AssistantOverlay() {
               opacity: phase === "morphing" ? 0 : 1,
             }}
           >
-            <EmojiAssistant emotion={emotion} size={220} />
+            <LottieAssistant emotion={emotion} size={220} />
           </div>
 
           <div className="mt-6 text-center max-w-lg px-4">
@@ -248,7 +248,7 @@ export function AssistantOverlay() {
           className="relative cursor-pointer"
           style={{ width: 96, height: 96, background: "transparent", border: "none", outline: "none" }}
         >
-          <EmojiAssistant emotion={emotion} size={88} bounce={bouncing} />
+          <LottieAssistant emotion={emotion} size={88} bounce={bouncing} />
           <div
             className="absolute inset-0 rounded-full transition-opacity duration-500 pointer-events-none"
             style={{ boxShadow: `0 0 20px 4px hsl(var(--primary) / ${isHovered ? 0.35 : 0.12})` }}

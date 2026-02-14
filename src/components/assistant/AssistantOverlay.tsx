@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { LottieAssistant } from "./LottieAssistant";
 import type { EmojiEmotion } from "./EmojiAssistant";
 import { ChatPanel } from "./ChatPanel";
-import { MessageCircle } from "lucide-react";
+
 import { motion, AnimatePresence } from "framer-motion";
 
 // Particle trail component
@@ -253,9 +253,6 @@ export function AssistantOverlay() {
             className="absolute inset-0 rounded-full transition-opacity duration-500 pointer-events-none"
             style={{ boxShadow: `0 0 20px 4px hsl(var(--primary) / ${isHovered ? 0.35 : 0.12})` }}
           />
-          <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-lg border-2 border-background">
-            <MessageCircle className="w-3.5 h-3.5 text-primary-foreground" />
-          </div>
         </button>
       </motion.div>
 

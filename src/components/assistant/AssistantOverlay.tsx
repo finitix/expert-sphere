@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { LottieAssistant } from "./LottieAssistant";
+import { EmojiAssistant } from "./EmojiAssistant";
 import type { EmojiEmotion } from "./EmojiAssistant";
 import { ChatPanel } from "./ChatPanel";
-
+import { MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Particle trail component
@@ -176,7 +176,7 @@ export function AssistantOverlay() {
               opacity: phase === "morphing" ? 0 : 1,
             }}
           >
-            <LottieAssistant emotion={emotion} size={220} />
+            <EmojiAssistant emotion={emotion} size={220} />
           </div>
 
           <div className="mt-6 text-center max-w-lg px-4">
@@ -248,11 +248,14 @@ export function AssistantOverlay() {
           className="relative cursor-pointer"
           style={{ width: 96, height: 96, background: "transparent", border: "none", outline: "none" }}
         >
-          <LottieAssistant emotion={emotion} size={88} bounce={bouncing} />
+          <EmojiAssistant emotion={emotion} size={88} bounce={bouncing} />
           <div
             className="absolute inset-0 rounded-full transition-opacity duration-500 pointer-events-none"
             style={{ boxShadow: `0 0 20px 4px hsl(var(--primary) / ${isHovered ? 0.35 : 0.12})` }}
           />
+          <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-lg border-2 border-background">
+            <MessageCircle className="w-3.5 h-3.5 text-primary-foreground" />
+          </div>
         </button>
       </motion.div>
 

@@ -67,8 +67,10 @@ const ROAM_POSITIONS = [
 ];
 
 export function AssistantOverlay() {
-  const [phase, setPhase] = useState<"hero" | "morphing" | "mini">("hero");
-  const [emotion, setEmotion] = useState<EmojiEmotion>("waving");
+  // Only show hero on first-ever visit; skip on reloads/other pages
+  const hasSeenHero = useRef(sessionStorage.getItem("assistant_hero_seen") === "true");
+  const [phase, setPhase] = useState<"hero" | "morphing" | "mini">(hasSeenHero.current ? "mini" : "hero");
+  const [emotion, setEmotion] = useState<EmojiEmotion>(hasSeenHero.current ? "idle" : "waving");
   const [chatOpen, setChatOpen] = useState(false);
   const [microMessage, setMicroMessage] = useState("");
   const [showMicro, setShowMicro] = useState(false);
@@ -98,11 +100,13 @@ export function AssistantOverlay() {
     return () => clearInterval(interval);
   }, [phase]);
 
-  // Hero → morph after 6 seconds
+  // Hero → morph after 6 seconds (only runs if phase started as "hero")
   useEffect(() => {
+    if (hasSeenHero.current) return;
     const timer = setTimeout(() => {
       setPhase("morphing");
       setEmotion("idle");
+      sessionStorage.setItem("assistant_hero_seen", "true");
       setTimeout(() => {
         setPhase("mini");
         setHeroVisible(false);
